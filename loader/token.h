@@ -15,7 +15,8 @@ enum class TOKEN_TYPE {
 	COMMA,
 	LPAREN,
 	RPAREN,
-	IDENTIFIER
+	IDENTIFIER,
+	NEW_LINE
 };
 struct token_t {
 	TOKEN_TYPE type;

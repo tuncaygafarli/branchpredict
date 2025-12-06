@@ -11,6 +11,7 @@ public:
 	data_t			reg_file_read(const reg_id_t& reg_id);
 	void			jump_to_label(label_id_t label_);
 	void			update_pc(memory_addr_t next_pc_val);
+	void			load_program(program_t&& program_);
 	memory_addr_t	get_pc();
 private:
 	memory_addr_t _pc; // program counter

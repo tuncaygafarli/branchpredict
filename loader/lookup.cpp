@@ -78,37 +78,43 @@ reg_id_t lookup_t::reg_id(const std::string& reg_string_id) {
 	return _registers.at(reg_string_id);
 }
 
-load_instruction_t::LOAD_INSTRUCTION_TYPE lookup_t::load_type(const std::string& str) {
+load_instruction_t::LOAD_INSTRUCTION_TYPE 
+lookup_t::load_type(const std::string& str) {
 	if (_load_instructions.find(str) == _load_instructions.end())
 		return load_instruction_t::LOAD_INSTRUCTION_TYPE::UNKNOWN;
 	return _load_instructions.at(str);
 }
 
-store_instruction_t::STORE_INSTRUCTION_TYPE lookup_t::store_type(const std::string& str) {
+store_instruction_t::STORE_INSTRUCTION_TYPE 
+lookup_t::store_type(const std::string& str) {
 	if (_store_instructions.find(str) == _store_instructions.end())
 		return store_instruction_t::STORE_INSTRUCTION_TYPE::UNKNOWN;
 	return _store_instructions.at(str);
 }
 
-alu_instruction_t::ALU_INSTRUCTION_TYPE lookup_t::alui_type(const std::string& str) {
+alu_instruction_t::ALU_INSTRUCTION_TYPE 
+lookup_t::alui_type(const std::string& str) {
 	if (_alui_instructions.find(str) == _alui_instructions.end())
 		return alu_instruction_t::ALU_INSTRUCTION_TYPE::UNKNOWN;
 	return _alui_instructions.at(str);
 }
 
-alu_instruction_t::ALU_INSTRUCTION_TYPE lookup_t::alur_type(const std::string& str) {
+alu_instruction_t::ALU_INSTRUCTION_TYPE 
+lookup_t::alur_type(const std::string& str) {
 	if (_alur_instructions.find(str) == _alur_instructions.end())
 		return alu_instruction_t::ALU_INSTRUCTION_TYPE::UNKNOWN;
 	return _alur_instructions.at(str);
 }
 
-branch_instruction_t::BRANCH_INSTRUCTION_TYPE lookup_t::branch_type(const std::string& str) {
+branch_instruction_t::BRANCH_INSTRUCTION_TYPE 
+lookup_t::branch_type(const std::string& str) {
 	if (_branch_instructions.find(str) == _branch_instructions.end())
 		return branch_instruction_t::BRANCH_INSTRUCTION_TYPE::UNKNOWN;
 	return _branch_instructions.at(str);
 }
 
-jump_instruction_t::JUMP_INSTRUCTION_TYPE lookup_t::jump_type(const std::string& str) {
+jump_instruction_t::JUMP_INSTRUCTION_TYPE 
+lookup_t::jump_type(const std::string& str) {
 	if (_jump_instructions.find(str) == _jump_instructions.end())
 		return jump_instruction_t::JUMP_INSTRUCTION_TYPE::UNKNOWN;
 	return _jump_instructions.at(str);

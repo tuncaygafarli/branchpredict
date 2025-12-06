@@ -1,7 +1,8 @@
-#include "parser.h"
+#include "loader.h"
 #include <iostream>
+#include "../cpu/cpu.h"
 
-void parser_t::parse_progam(const std::string& src) {
+void loader_t::load_program(const std::string& src,CPU& cpu) {
     std::ifstream file(src);
     if (!file.is_open()) {
         std::cout << "File path " << src << " doesn't exist.\n";
@@ -10,14 +11,23 @@ void parser_t::parse_progam(const std::string& src) {
     std::string line_raw;
     while (std::getline(file, line_raw)) {
         tokenize_line_text(line_raw);
-        parse_line();
+        load_instruction();
     }
     file.close();
+    cpu.load_program(std::move(_program));
 }
 
-void parser_t::parse_line() {
+void loader_t::load_instruction() {
 }
-void parser_t::tokenize_line_text(const std::string& line_raw) {
+void loader_t::advance() {
+
+    if (_current_token.type != TOKEN_TYPE::NEW_LINE) {
+		_current_index++;
+		_current_token = _line_tokens[_current_index];
+	}
+}
+
+void loader_t::tokenize_line_text(const std::string& line_raw) {
 
     _line_tokens.clear();
     size_t comment_pos = line_raw.find('#');
@@ -88,5 +98,6 @@ void parser_t::tokenize_line_text(const std::string& line_raw) {
             _line_tokens.emplace_back(token, TOKEN_TYPE::IDENTIFIER);
         }
     }
+    _line_tokens.emplace_back(std::string(), TOKEN_TYPE::NEW_LINE);
 }
 

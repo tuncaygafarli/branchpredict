@@ -29,6 +29,10 @@ void CPU::update_pc(memory_addr_t next_pc_val) {
 	_pc = next_pc_val;
 }
 
+void CPU::load_program(program_t&& program_) {
+	_program = std::move(program_);
+}
+
 memory_addr_t CPU::get_pc() {
 	return _pc;
 }
