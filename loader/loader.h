@@ -10,8 +10,7 @@ public:
 private:
     void        load_instruction();
     void        load_mem_instruction();
-    void        load_alui_instruction();
-    void        load_alur_instruction();
+    void        load_alu_instruction();
     void        load_branch_instruction();
     void        load_jump_instruction();
     void        load_load_upperimm_instruction();

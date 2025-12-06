@@ -80,9 +80,10 @@ struct alu_instruction_t : instruction_t {
     ALU_INSTRUCTION_TYPE type;
     bool is_imm = false;
     alu_instruction_t( 
-        int64_t src2_val, ALU_INSTRUCTION_TYPE type_,
+        ALU_INSTRUCTION_TYPE type_,
         const reg_id_t dest_reg_, 
         const reg_id_t src1_reg_, 
+        int64_t src2_val,
         bool is_imm_
     ) : 
         dest_reg(dest_reg_),

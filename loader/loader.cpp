@@ -17,15 +17,15 @@ void loader_t::load_program(const std::string &src, CPU &cpu)  {
         std::cout << "File path " << src << " doesn't exist.\n";
         exit(EXIT_FAILURE);
     }
-        std::string line_raw;
-        while (std::getline(file, line_raw)) {
-            tokenize_line_text(line_raw);
-            _current_index = 0;
-            _current_token = _line_tokens[0];
-            load_instruction();
-        }
-        file.close();
-        cpu.load_program(std::move(_program));
+    std::string line_raw;
+    while (std::getline(file, line_raw)) {
+        tokenize_line_text(line_raw);
+        _current_index = 0;
+        _current_token = _line_tokens[0];
+        load_instruction();
+    }
+    file.close();
+    cpu.load_program(std::move(_program));
 }
 
 void loader_t::load_instruction() {
@@ -35,10 +35,8 @@ void loader_t::load_instruction() {
         load_mem_instruction();
         break;
     case TOKEN_TYPE::ALU_OPERATION_R:
-        load_alui_instruction();
-        break;
     case TOKEN_TYPE::ALU_OPERATION_I:
-        load_alur_instruction();
+        load_alu_instruction();
         break;
     case TOKEN_TYPE::BRANCH_OPERATION:
         load_branch_instruction();
@@ -104,17 +102,48 @@ void loader_t::load_mem_instruction() {
     }
 }
 
-// @call : current token is immediate alu operation
-void loader_t::load_alui_instruction() {
-    
+// @call : current token is alu operation
+void loader_t::load_alu_instruction() {
+    token_t tmp = _current_token;
+    bool is_imm = false;
+    alu_instruction_t::ALU_INSTRUCTION_TYPE type;
+    advance();
+    EXPECT(TOKEN_TYPE::REGISTER);
+    reg_id_t dest_reg_id = lookup_t::reg_id(_current_token.word);
+    advance();
+    EXPECT(TOKEN_TYPE::COMMA);
+    advance();
+    EXPECT(TOKEN_TYPE::REGISTER);
+    reg_id_t src1_reg_id = lookup_t::reg_id(_current_token.word);
+    advance();
+    EXPECT(TOKEN_TYPE::COMMA);
+    advance();
+    int64_t src2_val;
+    // if our operation was imm
+    if(lookup_t::alui_type(tmp.word) != alu_instruction_t::ALU_INSTRUCTION_TYPE::UNKNOWN) {
+        type = lookup_t::alui_type(tmp.word);
+        EXPECT(TOKEN_TYPE::IMMEDIATE);
+        is_imm = true;
+        src2_val = std::stoi(_current_token.word);
+    } else if(lookup_t::alur_type(tmp.word) != alu_instruction_t::ALU_INSTRUCTION_TYPE::UNKNOWN) {
+        type = lookup_t::alur_type(tmp.word);
+        EXPECT(TOKEN_TYPE::REGISTER);
+        src2_val = lookup_t::reg_id(_current_token.word);
+    }
+    advance();
+    _program.emplace_back(
+        std::make_unique<alu_instruction_t>(
+            type,
+            dest_reg_id,
+            src1_reg_id,
+            src2_val,
+            is_imm
+        )
+    );
 }
 
-void loader_t::load_alur_instruction() {
-
-}
-
+// @call : current token is branch instruction
 void loader_t::load_branch_instruction() {
-
 }
 
 void loader_t::load_jump_instruction() {
