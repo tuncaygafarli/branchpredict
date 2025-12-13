@@ -158,6 +158,9 @@ void branch_instruction_t::execute(CPU& cpu) {
     if (predicted == should_branch) {
         cpu.incr_correct_predictions();
     }
+    else{
+        cpu.penalty();
+    }
     cpu.incr_total_branches();
     cpu.update_bht(_id,should_branch);
 }

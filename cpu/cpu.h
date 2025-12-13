@@ -26,6 +26,7 @@ public:
 	void			log(std::ostream& os);
 	void			incr_correct_predictions();
 	void			incr_total_branches();
+	void			penalty();
 	memory_addr_t	get_pc() const;
 private:
 	bool _halt = false;

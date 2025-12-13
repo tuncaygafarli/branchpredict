@@ -85,6 +85,9 @@ void CPU::incr_total_branches() {
 	_total_branches++;
 }
 
+void CPU::penalty() {
+	_cycles += BRANCH_MISPREDICTION_PENALTY;
+}
 memory_addr_t CPU::get_pc() const {
 	return _pc;
 }
