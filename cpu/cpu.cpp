@@ -73,7 +73,8 @@ void CPU::log(std::ostream& os) {
 	os << "Correct Predictions : " << _correct_predictions << "\n";
 	os << "Total Mispredictions : " << _total_branches - _correct_predictions << "\n";
 	os << "Prediction Accuracy : " << static_cast<float>(_correct_predictions) / static_cast<float>(_total_branches) * 100.0f << "%\n";
-    os << "--------------------------------------------------------------\n";
+	os << "Total cycles : " << _cycles << "\n";
+	os << "--------------------------------------------------------------\n";
 }
 
 void CPU::incr_correct_predictions() {
@@ -136,6 +137,7 @@ void CPU::execute() {
 	}
 	_program[_pc]->execute(*this);
 	_pc++;
+	_cycles++;
 }
 
 void CPU::update_bht(branch_instruction_id_t branch_label, bool branch_direction) {

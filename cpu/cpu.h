@@ -36,4 +36,5 @@ private:
 	std::unique_ptr<branch_predictor_t> _branch_predictor;
 	uint64_t _correct_predictions = 0;
 	uint64_t _total_branches = 0;
+	uint64_t _cycles = 0;
 };
