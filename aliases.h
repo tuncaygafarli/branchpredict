@@ -12,6 +12,7 @@ auto constexpr INVALID_REG_ID = 255;
 auto constexpr SHIFT_REGISTER_SIZE = 8;
 auto constexpr FSM_STATE_BITS = 2;
 auto constexpr BRANCH_MISPREDICTION_PENALTY = 3;
+auto constexpr CACHE_MISS_PENALTY = 100;
 union data_t {
 	uint64_t _unsigned;
 	int64_t  _signed;
