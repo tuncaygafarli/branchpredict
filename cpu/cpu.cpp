@@ -141,8 +141,10 @@ void CPU::execute() {
 	if (_program[_pc]->is_label_instruction()) {
 		_pc++;
 	}
+	auto old_pc = _pc;
 	_program[_pc]->execute(*this);
-	_pc++;
+	if(old_pc == _pc)
+		_pc++;
 	_cycles++;
 }
 

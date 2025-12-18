@@ -20,7 +20,9 @@ enum class TOKEN_TYPE {
 	NEW_LINE
 };
 struct token_t {
+	size_t row;
+	size_t column;
 	TOKEN_TYPE type;
 	std::string word;
-	token_t(const std::string& _word, const TOKEN_TYPE _type) : word(_word), type(_type) {}
+	token_t(const std::string& _word, const TOKEN_TYPE _type,size_t row_,size_t column_) : word(_word), type(_type),row(row_),column(column_) {}
 };

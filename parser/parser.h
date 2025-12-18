@@ -30,4 +30,6 @@ private:
     std::vector<std::pair<jump_instruction_t*,std::string>>              _unresolved_jump_instructions;// the instructions whose labels are yet to be found
     std::vector<token_t>                                                 _line_tokens;
     program_t                                                            _program;
+    size_t                                                               _line_number = 0;
+    size_t                                                               _column = 0;
 };

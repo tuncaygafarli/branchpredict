@@ -7,7 +7,7 @@
 #define EXPECT(EXPECTED_TOKEN_TYPE)                   \
     if (_current_token->type != EXPECTED_TOKEN_TYPE)   \
     {                                                 \
-        std::cout << "Error : Token did not meet the expected type(Cause : " << _current_token->word << ")\n" ;               \
+        std::cout << "Error(" << _current_token->row << "," <<  _current_token->column << ") : " <<  "Token " << "'" << _current_token->word << "' did not meet the expected type"  << "\n" ;               \
         exit(EXIT_FAILURE);                                       \
     }                                                             \
     
@@ -19,6 +19,7 @@ program_t&& parser_t::parse_program(const std::string &src)  {
     }
     std::string line_raw;
     while (std::getline(file, line_raw)) {
+        _line_number++;
         tokenize_line_text(line_raw);
         _current_index = 0;
         _current_token = &_line_tokens[0];
@@ -308,8 +309,8 @@ void parser_t::advance() {
 }
 
 void parser_t::tokenize_line_text(const std::string& line_raw) {
-
     _line_tokens.clear();
+    _column = 0;
     size_t comment_pos = line_raw.find('#');
     std::string line = (comment_pos != std::string::npos) ? line_raw.substr(0, comment_pos) : line_raw;
     if (line == line_raw) {
@@ -318,6 +319,7 @@ void parser_t::tokenize_line_text(const std::string& line_raw) {
     }
     size_t i = 0;
     while (i < line.size()) {
+        _column++;
         char ch = line[i];
 
         // Skip whitespace
@@ -333,7 +335,7 @@ void parser_t::tokenize_line_text(const std::string& line_raw) {
             else if (ch == '(') type = TOKEN_TYPE::LPAREN;
             else type = TOKEN_TYPE::RPAREN;
 
-            _line_tokens.emplace_back(std::string(1, ch), type);
+            _line_tokens.emplace_back(std::string(1, ch), type,_line_number,_column);
             ++i;
             continue;
         }
@@ -351,38 +353,42 @@ void parser_t::tokenize_line_text(const std::string& line_raw) {
 
         // Handle label: `label:`
         if (!token.empty() && token.back() == ':') {
-            _line_tokens.emplace_back(token.substr(0, token.length() - 1), TOKEN_TYPE::LABEL);
+            _line_tokens.emplace_back(token.substr(0, token.length() - 1), TOKEN_TYPE::LABEL,_line_number,_column);
             continue;
         }
 
         if(lookup_t::load_type(token) != load_instruction_t::LOAD_INSTRUCTION_TYPE::UNKNOWN){
-            _line_tokens.emplace_back(token, TOKEN_TYPE::LOAD_OPERATION);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::LOAD_OPERATION,_line_number,_column);
         } else if(lookup_t::store_type(token) != store_instruction_t::STORE_INSTRUCTION_TYPE::UNKNOWN) {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::STORE_OPERATION);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::STORE_OPERATION,_line_number,_column);
         } else if(lookup_t::alui_type(token) != alu_instruction_t::ALU_INSTRUCTION_TYPE::UNKNOWN) {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::ALU_OPERATION_I);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::ALU_OPERATION_I,_line_number,_column);
         } else if(lookup_t::alur_type(token) != alu_instruction_t::ALU_INSTRUCTION_TYPE::UNKNOWN) {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::ALU_OPERATION_R);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::ALU_OPERATION_R,_line_number,_column);
         } else if(lookup_t::branch_type(token) != branch_instruction_t::BRANCH_INSTRUCTION_TYPE::UNKNOWN) {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::BRANCH_OPERATION);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::BRANCH_OPERATION,_line_number,_column);
         } else if(lookup_t::jump_type(token) != jump_instruction_t::JUMP_INSTRUCTION_TYPE::UNKNOWN) {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::JUMP_OPERATION);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::JUMP_OPERATION,_line_number,_column);
         } else if(lookup_t::is_pseudo(token)) {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::PSUEDO_OPERATION);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::PSUEDO_OPERATION,_line_number,_column);
         } else if(token == "lui") {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::LOAD_UPPER);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::LOAD_UPPER,_line_number,_column);
         } else if(token == "auipc") {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::AUIPC);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::AUIPC,_line_number,_column);
         } else if (lookup_t::reg_id(token) != INVALID_REG_ID) {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::REGISTER);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::REGISTER,_line_number,_column);
         }else if (lookup_t::is_imm(token)) {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::IMMEDIATE);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::IMMEDIATE,_line_number,_column);
         }
         else {
-            _line_tokens.emplace_back(token, TOKEN_TYPE::IDENTIFIER);
+            _line_tokens.emplace_back(token, TOKEN_TYPE::IDENTIFIER,_line_number,_column);
         }
     }
-    _line_tokens.emplace_back(std::string(), TOKEN_TYPE::NEW_LINE);
+    _line_tokens.emplace_back(std::string(), TOKEN_TYPE::NEW_LINE,_line_number,_column);
+
+    if (_line_tokens[0].word == "jal" && _line_tokens.size() == 3) {
+        _line_tokens[0].type = TOKEN_TYPE::PSUEDO_OPERATION;
+    }
 }
 
 // @call : current token is pseudo instruction
@@ -459,9 +465,12 @@ void parser_t::parse_pseudo_instruction() {
 
         if((uint64_t)(imm_val) <= 4095){
             _program.emplace_back(
-                std::make_unique<load_upper_imm_instruction_t>(
+                std::make_unique<alu_instruction_t>(
+                    alu_instruction_t::ALU_INSTRUCTION_TYPE::ADD,
                     dest_reg,
-                    static_cast<int64_t>(high)
+                    0,
+                    static_cast<int64_t>(low),
+                    true
                 )
             );
         }
@@ -469,7 +478,7 @@ void parser_t::parse_pseudo_instruction() {
             _program.emplace_back(
                 std::make_unique<load_upper_imm_instruction_t>(
                     dest_reg,
-                    static_cast<int32_t>(imm_val) & 0xFFFFF000
+                    high
                 )
             );
             _program.emplace_back(
@@ -477,7 +486,7 @@ void parser_t::parse_pseudo_instruction() {
                     alu_instruction_t::ALU_INSTRUCTION_TYPE::ADD,
                     dest_reg,
                     dest_reg,
-                    static_cast<int64_t>(low & 0xFFF),
+                    low,
                     true
                 )
             );
