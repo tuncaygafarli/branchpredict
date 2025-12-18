@@ -146,26 +146,23 @@ struct branch_instruction_t : instruction_t {
         reg_id_t src1_,
         reg_id_t src2_,
         label_id_t label_,
-        const std::string& instr_str,
         branch_instruction_id_t branch_id
     ) :
         _src1_reg(src1_),
         _src2_reg(src2_),
-        _label_id(label_),
+        _target_label_id(label_),
         _type(type_),
-        _instruction_str(instr_str),
         _id(branch_id)
         {}
     void execute(CPU &cpu) override;
-    label_id_t target_label() override { return _label_id; }
-    void set_target_label(label_id_t label_id) { _label_id = label_id; };
+    label_id_t target_label() override { return _target_label_id; }
+    void set_target_label(label_id_t label_id) { _target_label_id = label_id; };
 
 private:
     branch_instruction_id_t _id;
-    std::string _instruction_str;
     reg_id_t _src1_reg; 
     reg_id_t _src2_reg;
-    label_id_t _label_id;
+    label_id_t _target_label_id;
 };
 struct jump_instruction_t : instruction_t {
     enum class JUMP_INSTRUCTION_TYPE
@@ -175,8 +172,8 @@ struct jump_instruction_t : instruction_t {
         UNKNOWN
     } _type;
     void execute(CPU &cpu) override;
-    label_id_t target_label() override { return _label_id; }
-    void set_target_label(label_id_t label_id) { _label_id = label_id; };
+    label_id_t target_label() override { return _target_label_id; }
+    void set_target_label(label_id_t label_id) { _target_label_id = label_id; };
     jump_instruction_t (
         JUMP_INSTRUCTION_TYPE type_,
         reg_id_t dest_reg_,
@@ -186,11 +183,11 @@ struct jump_instruction_t : instruction_t {
     ) : _type(type_),
         _dest_reg(dest_reg_),
         _src1(src1_),
-        _label_id(label_id_),
+        _target_label_id(label_id_),
         _imm(imm_) {}
 private:
     reg_id_t _dest_reg;
-    label_id_t _label_id; // jal uses this
+    label_id_t _target_label_id; // jal uses this
     reg_id_t _src1;// jalr uses this
     int64_t _imm;  // jalr uses this
 };
@@ -202,3 +199,4 @@ struct label_instruction_t :  instruction_t {
 private:
     label_id_t _label_id;
 };
+

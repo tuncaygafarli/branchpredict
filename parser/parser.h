@@ -11,6 +11,7 @@ public:
     program_t&&  parse_program(const std::string& src);
 private:
     void        parse_instruction();
+    void        parse_pseudo_instruction();
     void        parse_mem_instruction();
     void        parse_alu_instruction();
     void        parse_branch_instruction();

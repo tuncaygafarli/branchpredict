@@ -2,7 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
-#include <string>
+#include <string>   
 
 #include "../aliases.h"
 #include "../cpu/instruction.h"
@@ -19,6 +19,7 @@ public:
     static branch_instruction_t::BRANCH_INSTRUCTION_TYPE    branch_type(const std::string &str);
     static jump_instruction_t::JUMP_INSTRUCTION_TYPE        jump_type(const std::string &str);
     static bool                                             is_imm(const std::string &str);
+    static bool                                             is_pseudo(const std::string &str);
 
 private:
     static const std::unordered_map<std::string, reg_id_t>                                              _registers;
@@ -28,4 +29,5 @@ private:
     static const std::unordered_map<std::string,alu_instruction_t::ALU_INSTRUCTION_TYPE>                _alur_instructions;
     static const std::unordered_map<std::string,branch_instruction_t::BRANCH_INSTRUCTION_TYPE>          _branch_instructions;
     static const std::unordered_map<std::string,jump_instruction_t::JUMP_INSTRUCTION_TYPE>              _jump_instructions;
+    static const std::unordered_set<std::string>                                                        _pseudo_ops;
 };

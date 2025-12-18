@@ -122,7 +122,8 @@ void alu_instruction_t::execute(CPU& cpu) {
 }
 
 void load_upper_imm_instruction_t::execute(CPU& cpu) {
-    data_t commit_data = {_upimm & 0xFFFFFFFFFF000000};
+    int32_t imm32 = (int32_t)(_upimm & 0xFFFFF000); 
+    data_t commit_data = {(int64_t)imm32}; 
     cpu.reg_file_commit(_dest_reg,commit_data);
 }
 
@@ -154,7 +155,7 @@ void branch_instruction_t::execute(CPU& cpu) {
     }
     //std::cout << _instruction_str << std::endl;
     bool predicted = cpu.predict_branch(_id);
-    if (should_branch) cpu.jump_to_label(_label_id);
+    if (should_branch) cpu.jump_to_label(_target_label_id);
     if (predicted == should_branch) {
         cpu.incr_correct_predictions();
     }
@@ -169,7 +170,7 @@ void jump_instruction_t::execute(CPU& cpu) {
     memory_addr_t pc_next = cpu.get_pc() + 1;
     switch (_type) {
     case JUMP_INSTRUCTION_TYPE::JAL:
-        cpu.jump_to_label(_label_id);
+        cpu.jump_to_label(_target_label_id);
         break;
     case JUMP_INSTRUCTION_TYPE::JALR:
         data_t rs1_val = cpu.reg_file_read(_src1);
@@ -182,7 +183,8 @@ void jump_instruction_t::execute(CPU& cpu) {
 
 void auipc_instruction_t::execute(CPU& cpu) {
     int64_t pc_val = cpu.get_pc();
-    int64_t val = _upimm & (0xFFFFFFFFFF000000);
+    int32_t imm32 = (int32_t)(_upimm & 0xFFFFF000); 
+    int64_t val = (int64_t)(imm32);
     data_t commit_data = data_t();
     commit_data._signed = pc_val + val;
     cpu.reg_file_commit(_dest_reg, commit_data);

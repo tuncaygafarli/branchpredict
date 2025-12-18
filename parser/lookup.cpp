@@ -85,6 +85,14 @@ reg_id_t lookup_t::reg_id(const std::string& reg_string_id) {
 	return _registers.at(reg_string_id);
 }
 
+const std::unordered_set<std::string>
+lookup_t::_pseudo_ops = {
+    "nop","li","mv","not","neg",
+    "seqz","snez","sltz","sgtz","beqz",
+    "bnez","blez","bgez","bltz","bgtz",
+    "ble","bgt","bleu","bgtu","j","jal",
+    "jr","jalr","ret","call","la" 
+};
 load_instruction_t::LOAD_INSTRUCTION_TYPE 
 lookup_t::load_type(const std::string& str) {
 	if (_load_instructions.find(str) == _load_instructions.end())
@@ -149,4 +157,7 @@ bool lookup_t::is_imm(const std::string& s) {
         }
     }
     return true;
+}
+bool lookup_t::is_pseudo(const std::string& str) {
+    return _pseudo_ops.count(str);
 }
