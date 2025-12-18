@@ -463,7 +463,7 @@ void parser_t::parse_pseudo_instruction() {
         int32_t low = static_cast<int32_t>(imm_val << 52 >> 52); 
         int32_t high = static_cast<int32_t>(imm_val - low);     
 
-        if((uint64_t)(imm_val) <= 4095){
+        if(-2048<= imm_val && (imm_val) <= 2047){
             _program.emplace_back(
                 std::make_unique<alu_instruction_t>(
                     alu_instruction_t::ALU_INSTRUCTION_TYPE::ADD,
