@@ -137,9 +137,10 @@ lookup_t::jump_type(const std::string& str) {
 
 bool lookup_t::is_imm(const std::string& s) {
     if (s.empty()) return false;
+    size_t str_size = s.size();
     // Hexadecimal: 0x or 0X prefix
-    if (s.size() > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
-        for (size_t i = 2; i < s.size(); ++i) {
+    if (str_size > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
+        for (size_t i = 2; i < str_size; ++i) {
             char c = s[i];
             if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
                 return false;
@@ -150,8 +151,8 @@ bool lookup_t::is_imm(const std::string& s) {
     // Decimal: optional leading '-' and digits
     size_t i = 0;
     if (s[0] == '-') i = 1;
-    if (i == s.size()) return false;
-    for (; i < s.size(); ++i) {
+    if (i == str_size) return false;
+    for (; i < str_size; ++i) {
         if (!std::isdigit(static_cast<unsigned char>(s[i]))) {
             return false;
         }
