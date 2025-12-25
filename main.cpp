@@ -5,11 +5,19 @@
 
 #include "parser/parser.h"
 #include "cpu/cpu.h"
+#include <SFML/Graphics.hpp>
 
 int main(int argc, char** argv) {
     std::string input_file;
     std::string log_destination = "none"; 
     CPU::PREDICTOR_TYPE predictor_type = CPU::PREDICTOR_TYPE::GSHARE; 
+
+    // GUI TEST
+
+    sf::RenderWindow window(sf::VideoMode(200, 200), "MADE WITH COBALT ENGINE");
+    sf::CircleShape shape(100.f);
+    shape.setFillColor(sf::Color::Green);
+    shape.setRadius(30.f);
 
     
     for (int i = 1; i < argc; ++i) {
@@ -41,6 +49,21 @@ int main(int argc, char** argv) {
             }
         }
     }
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        window.clear();
+        window.draw(shape);
+        window.display();
+    }
+
 
 
     if (input_file.empty()) {
@@ -75,5 +98,6 @@ int main(int argc, char** argv) {
         cpu.log(*log_stream);  
     }
 
+    
     return 0;
 }

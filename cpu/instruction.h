@@ -1,13 +1,16 @@
 #pragma once
 #include "../aliases.h"
 #include <string>
+
 class CPU;
+
 struct instruction_t {
 	virtual void execute(CPU& cpu) = 0;
 	virtual label_id_t target_label() { return NO_LABEL; }
 	virtual bool is_label_instruction() { return false; }
 	virtual ~instruction_t() = default;
 };
+
 struct memory_instruction_t : instruction_t {
 	void execute(CPU& cpu) override = 0;
 	memory_instruction_t(
@@ -24,6 +27,7 @@ protected:
 	reg_id_t _base_reg;
 	offset_t _offset;
 };
+
 struct load_instruction_t : memory_instruction_t {
 	enum class LOAD_INSTRUCTION_TYPE
 	{
@@ -46,6 +50,7 @@ struct load_instruction_t : memory_instruction_t {
 private:
 	LOAD_INSTRUCTION_TYPE _type;
 };
+
 struct store_instruction_t : memory_instruction_t {
 	enum class STORE_INSTRUCTION_TYPE
 	{
@@ -66,6 +71,7 @@ struct store_instruction_t : memory_instruction_t {
 private:
 	STORE_INSTRUCTION_TYPE _type;
 };
+
 struct alu_instruction_t : instruction_t {
 	enum class ALU_INSTRUCTION_TYPE
 	{
@@ -119,6 +125,7 @@ private:
 	ALU_INSTRUCTION_TYPE _type;
 	bool _is_imm = false;
 };
+
 struct load_upper_imm_instruction_t : instruction_t {
 	load_upper_imm_instruction_t(reg_id_t dest_reg_, int64_t upimm_) : _dest_reg(dest_reg_), _upimm(upimm_) {}
 	void execute(CPU& cpu) override;
@@ -168,6 +175,7 @@ private:
 	reg_id_t _src2_reg;
 	label_id_t _target_label_id;
 };
+
 struct jump_instruction_t : instruction_t {
 	enum class JUMP_INSTRUCTION_TYPE
 	{
@@ -188,8 +196,7 @@ struct jump_instruction_t : instruction_t {
 		_dest_reg(dest_reg_),
 		_src1(src1_),
 		_target_label_id(label_id_),
-		_imm(imm_) {
-	}
+		_imm(imm_) {}
 private:
 	reg_id_t _dest_reg;
 	label_id_t _target_label_id; // jal uses this
