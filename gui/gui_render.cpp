@@ -33,23 +33,9 @@ GUIRender::GUIRender(){
 void GUIRender::init(CPU& cpu) {
 	const reg_file_t& reg_file = cpu.get_reg_file();
 
-	std::cout << "=== CPU REGISTER FILE STATE ===" << "\n";
-	std::cout << "Number of registers: " << reg_file.size() << "\n";
-
-	if (reg_file.empty()) {
-		std::cout << "WARNING: Register file is EMPTY!" << "\n";
-	}
-
-	for (const auto& [reg_id, reg_data] : reg_file) {
-		std::cout << "Register 0x" << std::hex << static_cast<int>(reg_id)
-			<< ": 0x" << std::hex << reg_data._unsigned
-			<< " (" << std::dec << reg_data._signed << ")" << "\n";
-	}
-	std::cout << "=============================" << "\n";
-
 	for (size_t i = 0; i < instruction_codes.size(); i++) {
 		instruction_elements.emplace_back(
-			sf::Color(45, 45, 50),
+			sf::Color(35, 35, 40),
 			instruction_codes[i],
 			i == 0
 		);
@@ -63,7 +49,7 @@ void GUIRender::init(CPU& cpu) {
 		std::string reg_data_str = data_t_to_string(reg_data);
 
 		reg_elements.emplace_back(
-			sf::Color(45, 45, 50),
+			sf::Color(35, 35, 40),
 			reg_id_str,
 			reg_data_str
 		);
@@ -178,14 +164,14 @@ void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
 	float reg_id_panel_x = window.getSize().x / 2;
 	float reg_id_panel_y = 0.f;
 	float reg_id_panel_width = window.getSize().x / 4;
-	float reg_id_panel_height = window.getSize().y / 32;
+	float reg_id_panel_height = window.getSize().y / 20;
 	sf::Vector2f reg_id_panel_size(reg_id_panel_width, reg_id_panel_height);
 
 	// Position for register DATA panel (right side)
 	float reg_data_panel_x = 3 * window.getSize().x / 4;
 	float reg_data_panel_y = 0.f;
 	float reg_data_panel_width = window.getSize().x / 4;
-	float reg_data_panel_height = window.getSize().y / 32;
+	float reg_data_panel_height = window.getSize().y / 20;
 	sf::Vector2f reg_data_panel_size(reg_data_panel_width, reg_data_panel_height);
 
 	for (int i = 0; i < reg_elements.size(); i++) {
