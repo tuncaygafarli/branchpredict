@@ -1,7 +1,4 @@
 #include <iostream>
-#include <algorithm>
-#include <cmath>
-#include <vector>
 #include <sstream>
 #include <iomanip>
 #include <string>
