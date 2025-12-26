@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
     }
 
     sf::Clock autorun_timer;
-    const float autorun_delay = 0.5f;
+    float autorun_delay = 0.5f;
 
     while (window.isOpen())
     {
@@ -141,6 +141,14 @@ int main(int argc, char** argv) {
                 if (event.key.code == sf::Keyboard::R) {
                     autorun = !autorun;
                     accumulator = 0.f;
+                }
+
+                if (event.key.code == sf::Keyboard::LShift) {
+                    autorun_delay += 1.f;
+                }
+
+                if (event.key.code == sf::Keyboard::LControl) {
+                    autorun_delay = std::max(0.1f, autorun_delay - 0.1f);
                 }
             }
         }
