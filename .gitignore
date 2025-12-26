@@ -101,4 +101,5 @@ vendor/glfw/lib/**/*
 !vendor/SFML/bin/
 !vendor/glfw/lib/
 
+!CMakeLists.txt
 *.ini
