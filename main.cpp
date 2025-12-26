@@ -3,9 +3,11 @@
 #include <string>
 #include <iostream>
 
+#include <SFML/Graphics.hpp>
+#include "gui/instruction_box.h"
+
 #include "parser/parser.h"
 #include "cpu/cpu.h"
-#include <SFML/Graphics.hpp>
 
 int main(int argc, char** argv) {
     std::string input_file;
@@ -14,12 +16,10 @@ int main(int argc, char** argv) {
 
     // GUI TEST
 
-    sf::RenderWindow window(sf::VideoMode(200, 200), "MADE WITH COBALT ENGINE");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
-    shape.setRadius(30.f);
+    sf::RenderWindow window(sf::VideoMode(600, 600), "MADE WITH COBALT ENGINE");
 
-    
+    instruction_box_t instruction_window;
+
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
 
@@ -59,8 +59,8 @@ int main(int argc, char** argv) {
                 window.close();
         }
 
-        window.clear();
-        window.draw(shape);
+        window.clear(sf::Color(30, 30, 35, 230));
+        instruction_window.draw_instructions(window, instruction_window.instructions);
         window.display();
     }
 
