@@ -11,6 +11,16 @@
 #include "gui_render.h"
 #include "../cpu/cpu.h"
 
+// helper functions
+
+std::string trim_instruction(const std::string& str) {
+	auto start = str.find_first_not_of(" \t\n\r");
+	if (start == std::string::npos) return "";
+
+	auto end = str.find_last_not_of(" \t\n\r");
+	return str.substr(start, end - start + 1);
+}
+
 GUIRender::GUIRender(){
 	std::string font_path = "C:\\Users\\Admin\\Downloads\\BigBlueTerminal\\BigBlueTermPlusNerdFontMono-Regular.ttf";
 
@@ -78,45 +88,36 @@ std::string GUIRender::data_t_to_string(const data_t& data) {
 }
 
 void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu){
+	draw_instructions(window);
+	draw_reg_file(window, cpu);
+}
+
+void GUIRender::draw_instructions(sf::RenderWindow& window) {
 	visible_height = static_cast<float>(window.getSize().y / 2);
 
 	// Position for instructor panel ( left side )
-	float startX = 0.f;
-	float startY = 0.f - scroll_offset;
-	float boxWidth = window.getSize().x / 2;
-	float boxHeight = 50.f;  
+	float instruction_start_x = 0.f;
+	float instruction_start_y = 0.f - scroll_offset;
+	float instruction_box_width = window.getSize().x / 2;
+	float instruction_box_height = 50.f;
 
-	float total_height = instruction_elements.size() * boxHeight;
+	float total_height = instruction_elements.size() * instruction_box_height;
 
 	float max_scroll = std::max(0.f, total_height - visible_height);
 	scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
 
-	sf::Vector2f instructor_size(boxWidth, boxHeight);
-
-	// Position for register ID panel (right side)
-	float reg_id_panel_x = window.getSize().x / 2;
-	float reg_id_panel_y = 0.f;
-	float reg_id_panel_width = window.getSize().x / 4;
-	float reg_id_panel_height = window.getSize().y / 32;
-	sf::Vector2f reg_id_panel_size(reg_id_panel_width, reg_id_panel_height);
-
-	// Position for register DATA panel (right side)
-	float reg_data_panel_x = 3 * window.getSize().x / 4;
-	float reg_data_panel_y = 0.f;
-	float reg_data_panel_width = window.getSize().x / 4;
-	float reg_data_panel_height = window.getSize().y / 32;
-	sf::Vector2f reg_data_panel_size(reg_data_panel_width, reg_data_panel_height);
+	sf::Vector2f instructor_size(instruction_box_width, instruction_box_height);
 
 	for (int i = 0; i < instruction_elements.size(); i++) {
-		float instruction_y_pos = startY + i * boxHeight;
+		float instruction_y_pos = instruction_start_y + i * instruction_box_height;
 
-		if (instruction_y_pos + boxHeight < 0) continue;
+		if (instruction_y_pos + instruction_box_height < 0) continue;
 
 		if (instruction_y_pos > visible_height) break;
-		
+
 		// Instructor box start
 		sf::RectangleShape box(instructor_size);
-		box.setPosition(startX, instruction_y_pos);
+		box.setPosition(instruction_start_x, instruction_y_pos);
 
 		if (instruction_elements[i].selected) {
 			box.setFillColor(sf::Color::White);
@@ -132,9 +133,9 @@ void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu){
 		// Instructor text start
 		sf::Text instructor_text;
 		instructor_text.setFont(font);
-		instructor_text.setString(instruction_elements[i].CODE);
+		instructor_text.setString(trim_instruction(instruction_elements[i].CODE));
 		instructor_text.setCharacterSize(24);
-		instructor_text.setPosition(box.getSize().x / 2, box.getSize().y / 2);
+		instructor_text.setPosition(box.getSize().x / 2, box.getSize().y / 2 - instruction_box_height / 2);
 		if (instruction_elements[i].selected) {
 			instructor_text.setFillColor(sf::Color::Black);
 		}
@@ -143,14 +144,30 @@ void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu){
 		}
 
 		sf::FloatRect textBounds = instructor_text.getLocalBounds();
-		float textX = startX + (boxWidth - textBounds.width) / 2.f;
-		float textY = instruction_y_pos + (boxHeight - textBounds.height) / 2.f;
+		float instruction_text_x = instruction_start_x + (instruction_box_width - textBounds.width) / 2.f;
+		float instruction_text_y = instruction_y_pos + (instruction_box_height - textBounds.height) / 2.f;
 
-		instructor_text.setPosition(textX, textY);
+		instructor_text.setPosition(instruction_text_x, instruction_text_y);
 		window.draw(instructor_text);
 		// Instructor text end
 
 	}
+}
+
+void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
+	// Position for register ID panel (right side)
+	float reg_id_panel_x = window.getSize().x / 2;
+	float reg_id_panel_y = 0.f;
+	float reg_id_panel_width = window.getSize().x / 4;
+	float reg_id_panel_height = window.getSize().y / 32;
+	sf::Vector2f reg_id_panel_size(reg_id_panel_width, reg_id_panel_height);
+
+	// Position for register DATA panel (right side)
+	float reg_data_panel_x = 3 * window.getSize().x / 4;
+	float reg_data_panel_y = 0.f;
+	float reg_data_panel_width = window.getSize().x / 4;
+	float reg_data_panel_height = window.getSize().y / 32;
+	sf::Vector2f reg_data_panel_size(reg_data_panel_width, reg_data_panel_height);
 
 	for (int i = 0; i < reg_elements.size(); i++) {
 		float reg_id_y_pos = reg_id_panel_y + i * reg_id_panel_height;
@@ -210,6 +227,7 @@ void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu){
 	}
 }
 
+
 void GUIRender::add_instruction(const std::string& asm_code) {
 	this->instruction_elements.emplace_back(
 		sf::Color(45, 45, 50),
@@ -231,7 +249,7 @@ void GUIRender::set_selection(int& selectionIndex) {
 void GUIRender::scroll(float amount) {
 	scroll_offset += amount;
 
-	float total_height = instruction_elements.size() * (45.f); // boxHeight + spacing
+	float total_height = instruction_elements.size() * (50.f);
 	float max_scroll = std::max(0.f, total_height - visible_height);
 
 	scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
@@ -240,9 +258,8 @@ void GUIRender::scroll(float amount) {
 void GUIRender::ensure_visible(int index) {
 	if (index < 0 || index >= static_cast<int>(instruction_elements.size())) return;
 
-	float boxHeight = 40.f;
-	float spacing = 5.f;
-	float item_height = boxHeight + spacing;
+	float boxHeight = 50.f;
+	float item_height = boxHeight;
 
 	float item_top = index * item_height;
 	float item_bottom = item_top + item_height;

@@ -37,6 +37,8 @@ public :
 	GUIRender();
 	void init(CPU& cpu);
 	void draw_gui(sf::RenderWindow& window, CPU& cpu);
+	void draw_instructions(sf::RenderWindow& window);
+	void draw_reg_file(sf::RenderWindow& window, CPU& cpu);
 	void add_instruction(const std::string& asm_code);
 	void set_selection(int& selectionIndex);
 	void scroll(float amount);
