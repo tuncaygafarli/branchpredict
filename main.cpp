@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <SFML/Graphics.hpp>
-#include "gui/instruction_box.h"
+#include "gui/gui_render.h"
 
 #include "parser/parser.h"
 #include "cpu/cpu.h"
@@ -16,10 +16,9 @@ int main(int argc, char** argv) {
 
     // GUI TEST
 
-    sf::RenderWindow window(sf::VideoMode(600, 600), "MADE WITH COBALT ENGINE");
+    sf::RenderWindow window(sf::VideoMode(1200, 800), "BranchPredictor");
 
-    instruction_box_t instruction_window;
-    instruction_window.add_instruction("ahh uhh");
+    GUIRender gui_render;
     int selection_index = 0;
 
     for (int i = 1; i < argc; ++i) {
@@ -61,25 +60,25 @@ int main(int argc, char** argv) {
                 window.close();
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                 selection_index++;
-                if (selection_index >= instruction_window.instruction_elements.size()) {
+                if (selection_index >= gui_render.instruction_elements.size()) {
                     selection_index = 0;
                 }
-                instruction_window.set_selection(selection_index);
+                gui_render.set_selection(selection_index);
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                 selection_index--;
 
                 if (selection_index < 0) {
-                    selection_index = instruction_window.instruction_elements.size() - 1;
+                    selection_index = gui_render.instruction_elements.size() - 1;
                 }
 
-                instruction_window.set_selection(selection_index);
+                gui_render.set_selection(selection_index);
             }
         }
 
         window.clear(sf::Color(30, 30, 35, 230));
-        instruction_window.draw_instructions(window);
+        gui_render.draw_instructions(window);
         window.display();
     }
 

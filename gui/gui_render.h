@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-class instruction_box_t {
+class GUIRender {
 private:
 	struct instruction_element_t {
 		sf::Color bg_color;
@@ -18,11 +18,29 @@ private:
 	bool font_loaded = false;
 
 public :
-	instruction_box_t();
+	GUIRender();
 	void draw_instructions(sf::RenderWindow& window);
 	void add_instruction(const std::string& asm_code);
 	void set_selection(int& selectionIndex);
 
-	std::vector<std::string> instruction_codes = {"MOV EAX, 10", "MOV [EBX], EAX", "MOV EAX, 10", "MOV [EBX], EAX","MOV EAX, 10", "MOV [EBX], EAX" };
+	std::vector<std::string> instruction_codes = {
+		"MOV EAX, 10", 
+		"MOV [EBX], EAX", 
+		"MOV EAX, 10", 
+		"MOV [EBX], EAX",
+		"MOV EAX, 10", 
+		"MOV [EBX], EAX",
+		"MOV EAX, 10",
+		"MOV [EBX], EAX",
+		"MOV EAX, 10",
+		"MOV [EBX], EAX",
+		"MOV EAX, 10",
+		"MOV [EBX], EAX",
+		"MOV EAX, 10",
+		"MOV [EBX], EAX",
+		"MOV EAX, 10",
+		"MOV [EBX], EAX",
+		"MOV EAX, 10"
+	};
 	std::vector<instruction_element_t> instruction_elements;
 };

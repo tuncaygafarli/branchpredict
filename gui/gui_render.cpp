@@ -3,9 +3,9 @@
 #include <iostream>
 #include <vector>
 
-#include "instruction_box.h"
+#include "gui_render.h"
 
-instruction_box_t::instruction_box_t(){
+GUIRender::GUIRender(){
 	for (size_t i = 0; i < instruction_codes.size(); i++) {
 		instruction_elements.emplace_back(
 			sf::Color(45, 45, 50),
@@ -22,17 +22,19 @@ instruction_box_t::instruction_box_t(){
 	}
 }
 
-void instruction_box_t::draw_instructions(sf::RenderWindow& window) {
-	sf::Vector2f size(window.getSize().x, 50.f);
+void GUIRender::draw_instructions(sf::RenderWindow& window) {
+	sf::Vector2f size(window.getSize().x / 2, 50.f);
 
 	float startX = 0.f;
 	float startY = 0.f;
-	float boxWidth = window.getSize().x;
+	float boxWidth = window.getSize().x / 2;
 	float boxHeight = 40.f;  
 	float spacing = 5.f;
 
 	for (int i = 0; i < this->instruction_elements.size(); i++) {
 		float yPos = startY + i * (boxHeight + spacing);
+		
+		// Element box
 		sf::RectangleShape box(size);
 		box.setPosition(startX, yPos);
 
@@ -46,6 +48,7 @@ void instruction_box_t::draw_instructions(sf::RenderWindow& window) {
 		box.setOutlineThickness(2.f);
 		window.draw(box);
 
+		// Element text
 		sf::Text text;
 		text.setFont(font);
 		text.setString(this->instruction_elements[i].CODE);
@@ -67,7 +70,7 @@ void instruction_box_t::draw_instructions(sf::RenderWindow& window) {
 	}
 }
 
-void instruction_box_t::add_instruction(const std::string& asm_code) {
+void GUIRender::add_instruction(const std::string& asm_code) {
 	this->instruction_elements.emplace_back(
 		sf::Color(45, 45, 50),
 		asm_code,
@@ -75,7 +78,7 @@ void instruction_box_t::add_instruction(const std::string& asm_code) {
 	);
 }
 
-void instruction_box_t::set_selection(int& selectionIndex) {
+void GUIRender::set_selection(int& selectionIndex) {
 	for (auto& elem : this->instruction_elements) {
 		elem.selected = false;
 	}
