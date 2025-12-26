@@ -1,7 +1,7 @@
 #include "lookup.h"
 
 const std::unordered_map<std::string,reg_id_t> 
-lookup_t::_registers = {
+lookup_t::_str_to_id_registers = {
 	{"zero",0},{"ra",1},{"sp",2},{"gp",3},
 	{"tp",4},{"t0",5},{"t1",6},{"t2",7},
 	{"s0",8},{"s1",9},{"a0",10},
@@ -19,7 +19,18 @@ lookup_t::_registers = {
 	{"x23",23},{"x24",24},{"x25",25}, {"x26",26},
 	{"x27",27},{"x28",28}, {"x29",29}, {"x30",30},{"x31",31}
 };
-const std::unordered_map<std::string, load_instruction_t::LOAD_INSTRUCTION_TYPE> 
+const std::unordered_map<reg_id_t, std::string>
+lookup_t::_id_to_str_registers = {
+    {0, "zero"}, {1, "ra"}, {2, "sp"}, {3, "gp"}, {4, "tp"},
+    {5, "t0"}, {6, "t1"}, {7, "t2"}, {8, "s0"}, {9, "s1"},
+    {10, "a0"}, {11, "a1"}, {12, "a2"}, {13, "a3"}, {14, "a4"},
+    {15, "a5"}, {16, "a6"}, {17, "a7"}, {18, "s2"}, {19, "s3"},
+    {20, "s4"}, {21, "s5"}, {22, "s6"}, {23, "s7"}, {24, "s8"},
+    {25, "s9"}, {26, "s10"}, {27, "s11"}, {28, "t3"}, {29, "t4"},
+    {30, "t5"}, {31, "t6"}
+
+};
+const std::unordered_map<std::string, load_instruction_t::LOAD_INSTRUCTION_TYPE>
 lookup_t::_load_instructions = {
     {"lw", load_instruction_t::LOAD_INSTRUCTION_TYPE::LW},
     {"lhu", load_instruction_t::LOAD_INSTRUCTION_TYPE::LHU},
@@ -80,9 +91,15 @@ lookup_t::_jump_instructions = {
     {"jal",jump_instruction_t::JUMP_INSTRUCTION_TYPE::JAL}
 };
 reg_id_t lookup_t::reg_id(const std::string& reg_string_id) {
-	if (_registers.find(reg_string_id) == _registers.end())
+	if (_str_to_id_registers.find(reg_string_id) == _str_to_id_registers.end())
 		return 255;
-	return _registers.at(reg_string_id);
+	return _str_to_id_registers.at(reg_string_id);
+}
+
+std::string lookup_t::reg_name(const reg_id_t reg_id) {
+    if (_id_to_str_registers.find(reg_id) == _id_to_str_registers.end())
+        return "zero";
+    return _id_to_str_registers.at(reg_id);
 }
 
 const std::unordered_set<std::string>

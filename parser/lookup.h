@@ -12,6 +12,7 @@ class lookup_t {
 public:
     lookup_t() = default;
     static reg_id_t                                         reg_id(const std::string &reg_string_id);
+    static std::string                                      reg_name(const reg_id_t reg_id);
     static load_instruction_t::LOAD_INSTRUCTION_TYPE        load_type(const std::string &str);
     static store_instruction_t::STORE_INSTRUCTION_TYPE      store_type(const std::string &str);
     static alu_instruction_t::ALU_INSTRUCTION_TYPE          alui_type(const std::string &str);
@@ -22,7 +23,8 @@ public:
     static bool                                             is_pseudo(const std::string &str);
 
 private:
-    static const std::unordered_map<std::string, reg_id_t>                                              _registers;
+    static const std::unordered_map<std::string, reg_id_t>                                              _str_to_id_registers;
+    static const std::unordered_map<reg_id_t, std::string>                                              _id_to_str_registers;
     static const std::unordered_map<std::string,load_instruction_t::LOAD_INSTRUCTION_TYPE>              _load_instructions;
     static const std::unordered_map<std::string,store_instruction_t::STORE_INSTRUCTION_TYPE>            _store_instructions;
     static const std::unordered_map<std::string,alu_instruction_t::ALU_INSTRUCTION_TYPE>                _alui_instructions;
