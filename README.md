@@ -59,8 +59,6 @@ git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
 .\bootstrap-vcpkg.bat
 vcpkg install glfw3
-# Pass the toolchain to CMake:
-cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
 ```
 
 **macOS (Homebrew example):**
@@ -75,7 +73,7 @@ brew install glfw
 
 ### 4.1 Building the Project
 
-**Cross-platform (CMake):**
+**Linux and MacOS:**
 
 ```bash
 git clone https://github.com/f3rhd/cpuinsight.git
@@ -87,8 +85,7 @@ cmake --build build
 **Windows Visual Studio:**
 
 ```bash
-cmake -S . -B build -G "Visual Studio 17 2022" -A x64
-# Then open build/CPUInsight.sln
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ```
 
 ---
@@ -142,7 +139,6 @@ Run **headless with logging**:
 * Adjust **execution speed** dynamically
 
 ![Execution Flow Highlight](docs/images/execution_stepthrough.gif)
-![Register & Cache View](docs/images/register_cache.gif)
 
 ---
 
