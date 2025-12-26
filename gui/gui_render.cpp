@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -12,7 +11,9 @@
 #include "../cpu/cpu.h"
 #include "helpers.h"
 
-GUIRender::GUIRender(){
+constexpr float HEADER_HEIGHT = 60.f;
+
+GUIRender::GUIRender() {
 	std::string font_path = "C:\\Users\\Admin\\Downloads\\BigBlueTerminal\\BigBlueTermPlusNerdFontMono-Regular.ttf";
 
 	if (!font.loadFromFile(font_path))
@@ -68,9 +69,7 @@ void GUIRender::update_registers(CPU& cpu) {
 	}
 }
 
-
-
-void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu){
+void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu) {
 	draw_instructions(window);
 	draw_reg_file(window, cpu);
 }
@@ -78,47 +77,16 @@ void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu){
 void GUIRender::draw_instructions(sf::RenderWindow& window) {
 	visible_height = static_cast<float>(window.getSize().y / 2);
 
-	// Header for panel
-	float header_start_x = 0.f;
-	float header_start_y = 0.f;
-	float header_box_width = window.getSize().x / 2;
-	float header_box_height = 60.f;
-	sf::Vector2f header_size(header_box_width, header_box_height);
-
-	// Header box
-	sf::RectangleShape header_panel(header_size);
-	header_panel.setPosition(header_start_x, header_start_y);
-	header_panel.setFillColor(sf::Color::White);
-	header_panel.setOutlineThickness(2.f);
-
-	window.draw(header_panel);
-	// Header box end
-
-	// Header text start
-	sf::Text header_text;
-	header_text.setFont(font);
-	header_text.setString("INSTRUCTIONS");
-	header_text.setCharacterSize(24);
-	header_text.setPosition(header_panel.getSize().x / 2, header_panel.getSize().y / 2 - header_box_height / 2);
-    header_text.setFillColor(sf::Color::Black);
-
-	sf::FloatRect header_text_bounds = header_text.getLocalBounds();
-	float header_text_x = header_start_x + (header_box_width - header_text_bounds.width) / 2.f;
-	float header_text_y = header_start_y + (header_box_height - header_text_bounds.height) / 2.f;
-
-	header_text.setPosition(header_text_x, header_text_y);
-	window.draw(header_text);
-	// Header text end
-
 	// Position for instructor panel ( left side )
 	float instruction_start_x = 0.f;
-	float instruction_start_y = header_box_height - scroll_offset;
+	float instruction_start_y = HEADER_HEIGHT - scroll_offset;  // Start below header
 	float instruction_box_width = window.getSize().x / 2;
-	float instruction_box_height = visible_height / 8;
+	float content_height = visible_height - HEADER_HEIGHT;
+	float instruction_box_height = content_height / 8;
 
-	float total_height = instruction_elements.size() * instruction_box_height;
 
-	float max_scroll = std::max(0.f, total_height - visible_height);
+	float total_content_height = instruction_elements.size() * instruction_box_height;
+	float max_scroll = std::max(0.f, total_content_height - content_height);
 	scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
 
 	sf::Vector2f instructor_size(instruction_box_width, instruction_box_height);
@@ -126,8 +94,7 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 	for (int i = 0; i < instruction_elements.size(); i++) {
 		float instruction_y_pos = instruction_start_y + i * instruction_box_height;
 
-		if (instruction_y_pos + instruction_box_height < 0) continue;
-
+		if (instruction_y_pos + instruction_box_height < HEADER_HEIGHT) continue;
 		if (instruction_y_pos > visible_height) break;
 
 		// Instructor box start
@@ -165,8 +132,39 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 		instructor_text.setPosition(instruction_text_x, instruction_text_y);
 		window.draw(instructor_text);
 		// Instructor text end
-
 	}
+
+	// Header for panel
+	float header_start_x = 0.f;
+	float header_start_y = 0.f;
+	float header_box_width = window.getSize().x / 2;
+	float header_box_height = HEADER_HEIGHT;
+	sf::Vector2f header_size(header_box_width, header_box_height);
+
+	// Header box
+	sf::RectangleShape header_panel(header_size);
+	header_panel.setPosition(header_start_x, header_start_y);
+	header_panel.setFillColor(sf::Color::White);
+	header_panel.setOutlineThickness(2.f);
+
+	window.draw(header_panel);
+	// Header box end
+
+	// Header text start
+	sf::Text header_text;
+	header_text.setFont(font);
+	header_text.setString("INSTRUCTIONS");
+	header_text.setCharacterSize(24);
+	header_text.setPosition(header_panel.getSize().x / 2, header_panel.getSize().y / 2 - header_box_height / 2);
+	header_text.setFillColor(sf::Color::Black);
+
+	sf::FloatRect header_text_bounds = header_text.getLocalBounds();
+	float header_text_x = header_start_x + (header_box_width - header_text_bounds.width) / 2.f;
+	float header_text_y = header_start_y + (header_box_height - header_text_bounds.height) / 2.f;
+
+	header_text.setPosition(header_text_x, header_text_y);
+	window.draw(header_text);
+	// Header text end
 }
 
 void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
@@ -233,7 +231,7 @@ void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
 	reg_data_header_text.setPosition(reg_data_header_text_x, reg_data_header_text_y);
 	window.draw(reg_data_header_text);
 	// Header for reg id text end
-	
+
 	// Position for register ID panel (right side)
 	float reg_id_panel_x = window.getSize().x / 2;
 	float reg_id_panel_y = reg_id_header_box_height;
@@ -326,10 +324,14 @@ void GUIRender::set_selection(int& selectionIndex) {
 }
 
 void GUIRender::scroll(float amount) {
+	const float HEADER_HEIGHT = 60.f;
+	const float content_height = visible_height - HEADER_HEIGHT;
+	const float INSTRUCTION_HEIGHT = content_height / 8;
+
 	scroll_offset += amount;
 
-	float total_height = instruction_elements.size() * (50.f);
-	float max_scroll = std::max(0.f, total_height - visible_height);
+	float total_content_height = instruction_elements.size() * INSTRUCTION_HEIGHT;
+	float max_scroll = std::max(0.f, total_content_height - content_height);
 
 	scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
 }
@@ -337,16 +339,21 @@ void GUIRender::scroll(float amount) {
 void GUIRender::ensure_visible(int index) {
 	if (index < 0 || index >= static_cast<int>(instruction_elements.size())) return;
 
-	float boxHeight = visible_height / 8;
-	float item_height = boxHeight;
+	const float HEADER_HEIGHT = 60.f;
+	const float content_height = visible_height - HEADER_HEIGHT;
+	const float INSTRUCTION_HEIGHT = content_height / 8;
 
-	float item_top = index * item_height;
-	float item_bottom = item_top + item_height;
+	float item_top = index * INSTRUCTION_HEIGHT;
+	float item_bottom = item_top + INSTRUCTION_HEIGHT;
 
 	if (item_top < scroll_offset) {
 		scroll_offset = item_top;
 	}
-	else if (item_bottom > scroll_offset + visible_height) {
-		scroll_offset = item_bottom - visible_height;
+	else if (item_bottom > scroll_offset + content_height) {
+		scroll_offset = item_bottom - content_height;
 	}
+
+	float total_content_height = instruction_elements.size() * INSTRUCTION_HEIGHT;
+	float max_scroll = std::max(0.f, total_content_height - content_height);
+	scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
 }
