@@ -5,7 +5,6 @@
 #include "gui/gui_elements.h"
 
 #include <chrono>
-#include <iostream>
 int main(int argc, char** argv) {
 
     parser_t parser;
