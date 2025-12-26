@@ -49,7 +49,7 @@ void GUIRender::init(CPU& cpu) {
 		std::string reg_data_str = data_t_to_string(reg_data);
 
 		reg_elements.emplace_back(
-			sf::Color(35, 35, 40),
+			sf::Color(45, 45, 50),
 			reg_id_str,
 			reg_data_str
 		);
