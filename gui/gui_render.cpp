@@ -78,9 +78,41 @@ void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu){
 void GUIRender::draw_instructions(sf::RenderWindow& window) {
 	visible_height = static_cast<float>(window.getSize().y / 2);
 
+	// Header for panel
+	float header_start_x = 0.f;
+	float header_start_y = 0.f;
+	float header_box_width = window.getSize().x / 2;
+	float header_box_height = 60.f;
+	sf::Vector2f header_size(header_box_width, header_box_height);
+
+	// Header box
+	sf::RectangleShape header_panel(header_size);
+	header_panel.setPosition(header_start_x, header_start_y);
+	header_panel.setFillColor(sf::Color::White);
+	header_panel.setOutlineThickness(2.f);
+
+	window.draw(header_panel);
+	// Header box end
+
+	// Header text start
+	sf::Text header_text;
+	header_text.setFont(font);
+	header_text.setString("INSTRUCTIONS");
+	header_text.setCharacterSize(24);
+	header_text.setPosition(header_panel.getSize().x / 2, header_panel.getSize().y / 2 - header_box_height / 2);
+    header_text.setFillColor(sf::Color::Black);
+
+	sf::FloatRect header_text_bounds = header_text.getLocalBounds();
+	float header_text_x = header_start_x + (header_box_width - header_text_bounds.width) / 2.f;
+	float header_text_y = header_start_y + (header_box_height - header_text_bounds.height) / 2.f;
+
+	header_text.setPosition(header_text_x, header_text_y);
+	window.draw(header_text);
+	// Header text end
+
 	// Position for instructor panel ( left side )
 	float instruction_start_x = 0.f;
-	float instruction_start_y = 0.f - scroll_offset;
+	float instruction_start_y = header_box_height - scroll_offset;
 	float instruction_box_width = window.getSize().x / 2;
 	float instruction_box_height = visible_height / 8;
 
@@ -99,18 +131,18 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 		if (instruction_y_pos > visible_height) break;
 
 		// Instructor box start
-		sf::RectangleShape box(instructor_size);
-		box.setPosition(instruction_start_x, instruction_y_pos);
+		sf::RectangleShape instruction_panel(instructor_size);
+		instruction_panel.setPosition(instruction_start_x, instruction_y_pos);
 
 		if (instruction_elements[i].selected) {
-			box.setFillColor(sf::Color::White);
+			instruction_panel.setFillColor(sf::Color::White);
 		}
 		else {
-			box.setFillColor(instruction_elements[i].bg_color);
+			instruction_panel.setFillColor(instruction_elements[i].bg_color);
 		}
 
-		box.setOutlineThickness(2.f);
-		window.draw(box);
+		instruction_panel.setOutlineThickness(2.f);
+		window.draw(instruction_panel);
 		// Instructor box end
 
 		// Instructor text start
@@ -118,7 +150,7 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 		instructor_text.setFont(font);
 		instructor_text.setString(Helpers::trim_instruction(instruction_elements[i].CODE));
 		instructor_text.setCharacterSize(24);
-		instructor_text.setPosition(box.getSize().x / 2, box.getSize().y / 2 - instruction_box_height / 2);
+		instructor_text.setPosition(instruction_panel.getSize().x / 2, instruction_panel.getSize().y / 2 - instruction_box_height / 2);
 		if (instruction_elements[i].selected) {
 			instructor_text.setFillColor(sf::Color::Black);
 		}
@@ -138,16 +170,80 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 }
 
 void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
+	// Header for reg id panel
+	float reg_id_header_start_x = window.getSize().x / 2;
+	float reg_id_header_start_y = 0.f;
+	float reg_id_header_box_width = window.getSize().x / 4;
+	float reg_id_header_box_height = window.getSize().y / 20;
+	sf::Vector2f reg_id_header_size(reg_id_header_box_width, reg_id_header_box_height);
+
+	// Header for reg id box
+	sf::RectangleShape header_panel(reg_id_header_size);
+	header_panel.setPosition(reg_id_header_start_x, reg_id_header_start_y);
+	header_panel.setFillColor(sf::Color::White);
+	header_panel.setOutlineThickness(2.f);
+
+	window.draw(header_panel);
+	// Header for reg id box end
+
+	// Header for reg id text start
+	sf::Text reg_id_header_text;
+	reg_id_header_text.setFont(font);
+	reg_id_header_text.setString("REG_ID");
+	reg_id_header_text.setCharacterSize(24);
+	reg_id_header_text.setPosition(header_panel.getSize().x / 2, header_panel.getSize().y / 2 - reg_id_header_box_height / 2);
+	reg_id_header_text.setFillColor(sf::Color::Black);
+
+	sf::FloatRect reg_id_header_text_bounds = reg_id_header_text.getLocalBounds();
+	float header_text_x = reg_id_header_start_x + (reg_id_header_box_width - reg_id_header_text_bounds.width) / 2.f;
+	float header_text_y = reg_id_header_start_y + (reg_id_header_box_height - reg_id_header_text_bounds.height) / 2.f;
+
+	reg_id_header_text.setPosition(header_text_x, header_text_y);
+	window.draw(reg_id_header_text);
+	// Header for reg id text end
+
+	// Header for reg data panel
+	float reg_data_header_start_x = 3 * window.getSize().x / 4;
+	float reg_data_header_start_y = 0.f;
+	float reg_data_header_box_width = window.getSize().x / 4;
+	float reg_data_header_box_height = window.getSize().y / 20;
+	sf::Vector2f reg_data_header_size(reg_data_header_box_width, reg_data_header_box_height);
+
+	// Header for reg id box
+	sf::RectangleShape reg_data_header_panel(reg_data_header_size);
+	reg_data_header_panel.setPosition(reg_data_header_start_x, reg_data_header_start_y);
+	reg_data_header_panel.setFillColor(sf::Color::White);
+	reg_data_header_panel.setOutlineThickness(2.f);
+
+	window.draw(reg_data_header_panel);
+	// Header for reg id box end
+
+	// Header for reg id text start
+	sf::Text reg_data_header_text;
+	reg_data_header_text.setFont(font);
+	reg_data_header_text.setString("REG_DATA");
+	reg_data_header_text.setCharacterSize(24);
+	reg_data_header_text.setPosition(reg_data_header_panel.getSize().x / 2, reg_data_header_panel.getSize().y / 2 - reg_data_header_box_height / 2);
+	reg_data_header_text.setFillColor(sf::Color::Black);
+
+	sf::FloatRect reg_data_header_text_bounds = reg_data_header_text.getLocalBounds();
+	float reg_data_header_text_x = reg_data_header_start_x + (reg_data_header_box_width - reg_data_header_text_bounds.width) / 2.f;
+	float reg_data_header_text_y = reg_data_header_start_y + (reg_data_header_box_height - reg_data_header_text_bounds.height) / 2.f;
+
+	reg_data_header_text.setPosition(reg_data_header_text_x, reg_data_header_text_y);
+	window.draw(reg_data_header_text);
+	// Header for reg id text end
+	
 	// Position for register ID panel (right side)
 	float reg_id_panel_x = window.getSize().x / 2;
-	float reg_id_panel_y = 0.f;
+	float reg_id_panel_y = reg_id_header_box_height;
 	float reg_id_panel_width = window.getSize().x / 4;
 	float reg_id_panel_height = window.getSize().y / 20;
 	sf::Vector2f reg_id_panel_size(reg_id_panel_width, reg_id_panel_height);
 
 	// Position for register DATA panel (right side)
 	float reg_data_panel_x = 3 * window.getSize().x / 4;
-	float reg_data_panel_y = 0.f;
+	float reg_data_panel_y = reg_data_header_box_height;
 	float reg_data_panel_width = window.getSize().x / 4;
 	float reg_data_panel_height = window.getSize().y / 20;
 	sf::Vector2f reg_data_panel_size(reg_data_panel_width, reg_data_panel_height);
