@@ -1,5 +1,4 @@
 #pragma once
-
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
@@ -47,18 +46,6 @@ public :
 
 	std::string id_t_to_string(uint8_t reg_id);
 	std::string data_t_to_string(const data_t& data);
-
-	std::vector<std::string> instruction_codes2 = {
-		 "MOV EAX, 10", "MOV [EBX], EAX", "ADD ECX, 5",
-		"SUB EDX, 2", "CMP EAX, 0", "JNZ loop",
-		"PUSH EAX", "POP EBX", "CALL func",
-		"RET", "NOP", "HLT", "MOV ESI, 0",
-		"INC ESI", "DEC EDI", "JMP start","MOV EAX, 10", "MOV [EBX], EAX", "ADD ECX, 5",
-		"SUB EDX, 2", "CMP EAX, 0", "JNZ loop",
-		"PUSH EAX", "POP EBX", "CALL func",
-		"RET", "NOP", "HLT", "MOV ESI, 0",
-		"INC ESI", "DEC EDI", "JMP start"
-	};
 
 	std::vector<std::string> instruction_codes;
 	std::vector<instruction_element_t> instruction_elements;
