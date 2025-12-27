@@ -5,6 +5,7 @@ This branch is currently on working.
 * ArrowDown : Scrolls down in INSTRUCTION section
 
 * SpaceBar : Executes only one instruction
-* R : Enables / disables automatic execution
+* V : Enables / disables automatic execution
+* R : Resets the process
 * LShift : Increases auto CPU execution delay
 * LControl : Decreases auto CPU execution delay
