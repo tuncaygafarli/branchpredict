@@ -53,7 +53,7 @@ namespace gui {
 
 					float instruction_pos = static_cast<float>(pc) * line_height;
 
-					float scroll_goal = instruction_pos - (window_height * 0.5f) + (line_height * 0.5f);
+					float scroll_goal = instruction_pos - (window_height * 0.5f);
 
 					ImGui::SetScrollY(scroll_goal);
 				}
