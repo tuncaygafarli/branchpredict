@@ -30,11 +30,13 @@ int main(int argc, char** argv) {
     else {
         while (!cpu.endofprogram()) cpu.execute();
     }
-    if (cli_info.log_dest == "cout")
-        cpu.log(std::cout);
-    else {
-        std::ofstream os(cli_info.log_dest);
-        cpu.log(os);
+    if (!cli_info.enable_gui) {
+		if (cli_info.log_dest == "cout")
+			cpu.log(std::cout);
+		else {
+			std::ofstream os(cli_info.log_dest);
+			cpu.log(os);
+		}
     }
 }
 
