@@ -126,8 +126,10 @@ void GUIRender::draw_box(sf::RenderWindow& window,
 			text_obj.setPosition(text_x, text_y);
 		}
 		else {
-			text_obj.setPosition(position.x + 10,
-				position.y + size.y / 2);
+			sf::FloatRect textBounds = text_obj.getLocalBounds();
+			float text_x = position.x + 10;  // 10px padding from left
+			float text_y = position.y + (size.y - textBounds.height) / 2.f;
+			text_obj.setPosition(text_x, text_y);
 		}
 
 		window.draw(text_obj);
