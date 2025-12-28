@@ -16,6 +16,8 @@ GUICommandParser::GUICommandParser(GUIRender& gui_render, CPU& cpu, parser_t& pa
 }
 
 void GUICommandParser::parse_and_execute(const std::string& command_line) {
+    add_command_history(command_line);
+
     std::istringstream iss(command_line);
     std::string cmd;
     iss >> cmd;
@@ -23,9 +25,12 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
     std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 
     if (std::find(commands.begin(), commands.end(), cmd) == commands.end()) {
-        gui_render.output_message = "Unknown command.\nPlease run \"help\" to see available command list.";
+        std::ostringstream err_oss;
+        err_oss << "Unknown command \'" << cmd << "\'." << "\nPlease run \"help\" to see available command list." << "\n";
+        gui_render.output_message = err_oss.str();
     }
 
+    // help command
     if (cmd == "help") {
         std::ostringstream oss;
         oss << "=== CPUInsight Command List ===" << "\n";
@@ -40,11 +45,10 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         gui_render.output_message = oss.str();
     }
 
+    // load command
     if (cmd == "load") {
         std::string filename;
         iss >> filename;
-
-        std::cout << "Filename: " << filename << std::endl;
 
         if (filename.empty()) {
             std::cout << "ERROR: No filename!" << std::endl;
@@ -80,6 +84,40 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         }
     }
 
+    if (cmd == "set") {
+        std::string first_argument;
+        iss >> first_argument;
+
+        std::transform(first_argument.begin(), first_argument.end(), first_argument.begin(), ::tolower);
+
+        if (first_argument == "mode") {
+            std::string mode;
+            iss >> mode;
+            std::transform(first_argument.begin(), first_argument.end(), first_argument.begin(), ::tolower);
+
+            if (mode == "simple") {
+                cpu.set_branch_predictor(CPU::PREDICTOR_TYPE::SIMPLE);
+                gui_render.output_message = "Predictor set to: Simple";
+            }
+            else if (mode == "gag") {
+                cpu.set_branch_predictor(CPU::PREDICTOR_TYPE::GAg);
+                gui_render.output_message = "Predictor set to: GAg";
+            }
+            else if (mode == "pag") {
+                cpu.set_branch_predictor(CPU::PREDICTOR_TYPE::PAg);
+                gui_render.output_message = "Predictor set to: PAg";
+            }
+            else if (mode == "gshare") {
+                cpu.set_branch_predictor(CPU::PREDICTOR_TYPE::GSHARE);
+                gui_render.output_message = "Predictor set to: GShare";
+            }
+            else {
+                gui_render.output_message = "Unknown predictor. Available: simple, gag, pag, gshare";
+            }
+        }
+    }
+
+    // stats command
    if (cmd == "stats") {
        std::ostringstream oss;
        oss << "=== CPU Statistics ===" << "\n";
@@ -91,7 +129,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
        gui_render.output_message = oss.str();
     }
 
-
+   // keybindings command
    if (cmd == "keybindings") {
        std::ostringstream oss;
        oss << "=== CPUInsight Keybinding List ===" << "\n";
@@ -106,6 +144,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
        gui_render.output_message = oss.str();
    }
 
+   // run command
    if (cmd == "run") {
        gui_render.set_autorun(true);
        gui_render.set_accumulator(0.f);
@@ -113,6 +152,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
        gui_render.output_message = "Running the instructions...";
    }
 
+   // stop command
    if (cmd == "stop") {
        gui_render.set_autorun(false);
        gui_render.set_accumulator(0.f);
@@ -120,6 +160,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
        gui_render.output_message = "Stopped the process.";
    }
 
+   // exit command
    if (cmd == "exit") {
        exit_requested = true;
    }

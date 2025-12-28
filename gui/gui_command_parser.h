@@ -12,8 +12,10 @@ class GUICommandParser {
 public:
     GUICommandParser(GUIRender& gui_render, CPU& cpu, parser_t& parser);
     void parse_and_execute(const std::string& command_line);
-
     bool should_exit() const { return exit_requested; }
+
+    const std::vector<std::string>& get_command_history() const { return command_history; }
+    void add_command_history(const std::string& command) { command_history.push_back(command); }
 
 private:
     CPU& cpu;
@@ -23,4 +25,5 @@ private:
     bool exit_requested = false;
 
     const std::vector<std::string> commands = { "load", "stats", "run", "stop", "help", "keybindings", "exit" };
+    std::vector<std::string> command_history;
 };

@@ -112,21 +112,21 @@ data_t CPU::reg_file_read(const reg_id_t& reg_id) {
 
 CPU::CPU(CPU::PREDICTOR_TYPE type) {
 	switch (type) {
-	case(CPU::PREDICTOR_TYPE::SIMPLE):
-		_branch_predictor = std::make_unique<simple_predictor_t>();
-		break;
-	case(CPU::PREDICTOR_TYPE::GAg):
-		_branch_predictor = std::make_unique<GAg_predictor_t>();
-		break;
-	case(CPU::PREDICTOR_TYPE::PAg):
-		_branch_predictor = std::make_unique<PAg_predictor_t>();
-		break;
-	case(CPU::PREDICTOR_TYPE::GSHARE):
-		_branch_predictor = std::make_unique<gshare_predictor_t>();
-		break;
-		// shouldnt happen
-	default:
-		break;
+		case(CPU::PREDICTOR_TYPE::SIMPLE):
+			_branch_predictor = std::make_unique<simple_predictor_t>();
+			break;
+		case(CPU::PREDICTOR_TYPE::GAg):
+			_branch_predictor = std::make_unique<GAg_predictor_t>();
+			break;
+		case(CPU::PREDICTOR_TYPE::PAg):
+			_branch_predictor = std::make_unique<PAg_predictor_t>();
+			break;
+		case(CPU::PREDICTOR_TYPE::GSHARE):
+			_branch_predictor = std::make_unique<gshare_predictor_t>();
+			break;
+			// shouldnt happen
+		default:
+			break;
 	}
 	for (reg_id_t i = 0; i < 32; i++) {
 		_reg_file[i]._unsigned = 0ull;
@@ -169,4 +169,24 @@ void CPU::reset() {
 }
 bool CPU::halt() const {
 	return _halt;
+}
+
+void CPU::set_branch_predictor(PREDICTOR_TYPE type) {
+	switch (type) {
+		case PREDICTOR_TYPE::SIMPLE:
+			_branch_predictor = std::make_unique<simple_predictor_t>();
+			break;
+		case PREDICTOR_TYPE::GAg:
+			_branch_predictor = std::make_unique<GAg_predictor_t>();
+			break;
+		case PREDICTOR_TYPE::PAg:
+			_branch_predictor = std::make_unique<PAg_predictor_t>();
+			break;
+		case PREDICTOR_TYPE::GSHARE:
+			_branch_predictor = std::make_unique<gshare_predictor_t>();
+			break;
+		default:
+			_branch_predictor = std::make_unique<simple_predictor_t>();
+			break;
+	}
 }

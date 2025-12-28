@@ -38,6 +38,9 @@ public:
 		return static_cast<double>(_correct_predictions) / _total_branches;
 	}
 
+	const std::unique_ptr<branch_predictor_t>& get_branch_predictor() { return _branch_predictor; }
+	void set_branch_predictor(PREDICTOR_TYPE type);
+
 private:
 	bool _halt = false;
 	memory_addr_t _pc = 0; // program counter

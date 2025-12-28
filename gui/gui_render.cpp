@@ -11,25 +11,13 @@
 #include "../cpu/cpu.h"
 #include "helpers.h"
 
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd _getcwd
-#else
-#include <unistd.h>
-#endif
-
 constexpr float HEADER_HEIGHT = 60.f;
 constexpr float LOGGER_HEIGHT = 20.f;
 constexpr float MARGIN = 5.f;
 
 GUIRender::GUIRender() {
 	std::string font_path = "C:\\Users\\Admin\\Downloads\\BigBlueTerminal\\BigBlueTermPlusNerdFontMono-Regular.ttf";
-	std::string font_path_test = "./BigBlueTermPlusNerdFontMono-Regular.ttf";
-
-	char cwd[1024];
-	if (getcwd(cwd, sizeof(cwd)) != NULL) {
-		std::cout << "Current working directory: " << cwd << std::endl;
-	}
+	std::string font_path_test = "C:\\Windows\\Fonts\\BigBlueTermPlusNerdFontMono-Regular.ttf";
 
 	if (!font.loadFromFile(font_path))
 	{
@@ -160,6 +148,21 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 	float max_scroll = std::max(0.f, total_content_height - content_height);
 	scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
 
+	if (instruction_elements.size() == 0) {
+		sf::Text text_obj;
+		text_obj.setFont(font);
+		text_obj.setString("   Welcome to CPUInsight!\n\nPress ESC to enter CLI mode.");
+		text_obj.setCharacterSize(24);
+		text_obj.setFillColor(sf::Color::White);
+
+		sf::FloatRect textBounds = text_obj.getLocalBounds();
+		float text_x = (window.getSize().x / 2 - textBounds.width) / 2.f;
+		float text_y = window.getSize().y / 2;
+		text_obj.setPosition(text_x, text_y);
+
+		window.draw(text_obj);
+	}
+
 	for (int i = 0; i < instruction_elements.size(); i++) {
 		float instruction_y_pos = instruction_start_y + i * instruction_box_height;
 
@@ -190,14 +193,12 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 		sf::Color::Black,
 		24,
 		true);
-
 }
 
 void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
 	register_row_height = window.getSize().y / 20.f;
 	visible_registers_count = static_cast<int>((window.getSize().y - register_row_height) / register_row_height);
 	float REG_CONST_HEIGHT = window.getSize().y / 20;
-
 
 	// register positions
 	float reg_id_panel_x = window.getSize().x / 2;
@@ -455,6 +456,8 @@ void GUIRender::run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_par
 	float autorun_delay = 0.5f;
 	int selection_index = 0;
 
+	int command_index = -1;
+
 	while (window.isOpen())
 	{
 		float delta_time = autorun_timer.restart().asSeconds();
@@ -562,6 +565,35 @@ void GUIRender::run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_par
 
 						if (gc_parser.should_exit()) {
 							window.close();
+						}
+					}
+
+					if (event.key.code == sf::Keyboard::Up) {
+						const auto& history = gc_parser.get_command_history();
+
+						if (!history.empty()) {
+							if (command_index == -1) {
+								command_index = static_cast<int>(history.size()) - 1;
+							}
+							else if (command_index > 0) {
+								command_index--;
+							}
+
+							logger_text = history[command_index];
+						}
+					}
+					else if (event.key.code == sf::Keyboard::Down) {
+						const auto& history = gc_parser.get_command_history();
+
+						if (!history.empty() && command_index != -1) {
+							if (command_index < static_cast<int>(history.size()) - 1) {
+								command_index++;
+								logger_text = history[command_index];
+							}
+							else {
+								command_index = -1;
+								logger_text.clear();
+							}
 						}
 					}
 				}
