@@ -23,6 +23,7 @@ quartus/
 *.txt
 
 .vs/
+.vscode/
 *.user
 *.suo
 *.VC.db
