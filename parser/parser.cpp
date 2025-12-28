@@ -14,7 +14,7 @@
     }
 \
 
-program_t&& parser_t::parse_program(const std::string& src, GUIRender& gui_render) {
+program_t parser_t::parse_program(const std::string& src, GUIRender& gui_render) {
 	std::ifstream file(src);
 	if (!file.is_open()) {
 		std::cout << "\033[31m" << "Error: \033[0m" << "File path " << src << " doesn't exist.\n";
