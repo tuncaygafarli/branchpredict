@@ -4,7 +4,6 @@
 #include <cmath>
 #include <vector>
 #include <sstream>
-#include <iomanip>
 #include <string>
 
 #include "gui_render.h"
@@ -12,12 +11,25 @@
 #include "../cpu/cpu.h"
 #include "helpers.h"
 
+#ifdef _WIN32
+#include <direct.h>
+#define getcwd _getcwd
+#else
+#include <unistd.h>
+#endif
+
 constexpr float HEADER_HEIGHT = 60.f;
 constexpr float LOGGER_HEIGHT = 20.f;
 constexpr float MARGIN = 5.f;
 
 GUIRender::GUIRender() {
 	std::string font_path = "C:\\Users\\Admin\\Downloads\\BigBlueTerminal\\BigBlueTermPlusNerdFontMono-Regular.ttf";
+	std::string font_path_test = "./BigBlueTermPlusNerdFontMono-Regular.ttf";
+
+	char cwd[1024];
+	if (getcwd(cwd, sizeof(cwd)) != NULL) {
+		std::cout << "Current working directory: " << cwd << std::endl;
+	}
 
 	if (!font.loadFromFile(font_path))
 	{
@@ -72,6 +84,7 @@ void GUIRender::update_registers(CPU& cpu) {
 	}
 }
 
+// updates instructions when user tries to load it from prompt
 void GUIRender::update_instructions(CPU& cpu) {
 	instruction_elements.clear();
 	for (size_t i = 0; i < instruction_codes.size(); i++) {
@@ -250,7 +263,6 @@ void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
 }
 
 void GUIRender::draw_prompt(sf::RenderWindow& window, CPU& cpu) {
-	// logger input field
 	float logger_panel_width = window.getSize().x / 2 - 2.f;
 	float logger_panel_height = 50.f;
 	float logger_panel_x = 0.f;
@@ -265,8 +277,20 @@ void GUIRender::draw_prompt(sf::RenderWindow& window, CPU& cpu) {
 		24,
 		true);
 
-	float cursor_x = logger_panel_x + 10;
+	std::string prompt_char = "> ";
+	float prompt_x = logger_panel_x + 10;
 	float cursor_y = logger_panel_y + 10;
+
+	sf::Text prompt_text;
+	prompt_text.setFont(font);
+	prompt_text.setString(prompt_char);
+	prompt_text.setCharacterSize(24);
+	prompt_text.setFillColor(sf::Color::Black);
+	prompt_text.setPosition(prompt_x, cursor_y);
+	window.draw(prompt_text);
+
+	float text_start_x = prompt_x + prompt_text.getLocalBounds().width;
+	float cursor_x = text_start_x;
 
 	if (!logger_text.empty()) {
 		sf::Text text_obj;
@@ -274,7 +298,7 @@ void GUIRender::draw_prompt(sf::RenderWindow& window, CPU& cpu) {
 		text_obj.setString(logger_text);
 		text_obj.setCharacterSize(24);
 		text_obj.setFillColor(sf::Color::Black);
-		text_obj.setPosition(logger_panel_x + 10, cursor_y);
+		text_obj.setPosition(text_start_x, cursor_y);
 		window.draw(text_obj);
 
 		cursor_x = text_obj.getPosition().x + text_obj.getLocalBounds().width;
@@ -303,7 +327,7 @@ void GUIRender::set_text(sf::Uint32 unicode) {
 
 void GUIRender::draw_output(sf::RenderWindow& window, CPU& cpu) {
 	float output_width = window.getSize().x / 2 - 2.f;
-	float output_height = 200.f;
+	float output_height = 250.f;
 	float output_x = 0.f;
 	float output_y = window.getSize().y - output_height - 50.f;
 
@@ -417,11 +441,15 @@ void GUIRender::ensure_register_visible(int reg_index) {
 	register_scroll_offset = std::clamp(register_scroll_offset, 0.f, max_scroll);
 }
 
+void GUIRender::send_parser_err(const std::string& message) {
+	output_message = message;
+}
+
+
 // RUN THE GUI HERE
 void GUIRender::run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_parser) {
 	set_mode(GUIRender::InputMode::NAVIGATION);
 	bool cpu_halted = cpu.halt();
-	bool autorun = false;
 
 	sf::Clock autorun_timer;
 	float autorun_delay = 0.5f;
@@ -430,7 +458,6 @@ void GUIRender::run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_par
 	while (window.isOpen())
 	{
 		float delta_time = autorun_timer.restart().asSeconds();
-		static float accumulator = 0.f;
 
 		sf::Event event;
 

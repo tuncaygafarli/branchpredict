@@ -22,5 +22,5 @@ private:
 
     bool exit_requested = false;
 
-    const std::vector<std::string> commands = { "load", "exit" };
+    const std::vector<std::string> commands = { "load", "stats", "run", "stop", "help", "keybindings", "exit" };
 };

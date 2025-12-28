@@ -35,6 +35,11 @@ private:
 
 	bool show_output = false;
 
+	bool autorun = false;
+    float accumulator = 0.f;
+
+	bool parser_err = false;
+
 public :
 	GUIRender();
 
@@ -69,9 +74,33 @@ public :
 
 	void run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_parser);
 
+	void send_parser_err(const std::string& message);
 
 	InputMode current_mode = InputMode::NAVIGATION;
 	void set_mode(InputMode mode) { current_mode = mode; }
+
+	// getters and setters
+	bool get_show_output() { return show_output; }
+	void set_show_output(bool output) { show_output = output; }
+
+	std::string get_output() { return output_message; }
+	void set_output(const std::string& msg) { output_message = msg; }
+	void clear_output() { output_message.clear(); }
+	bool has_output() const { return !output_message.empty(); }
+
+	bool get_autorun() { return autorun; }
+	void set_autorun(bool output) { autorun = output; }
+
+	float get_accumulator() { return accumulator; }
+	void set_accumulator(float output) { accumulator = output; }
+
+	bool get_parser_err() { return parser_err; }
+	void set_parser_err(bool output) { parser_err = output; }
+
+	std::vector<std::string> instruction_codes;
+	std::vector<instruction_element_t> instruction_elements;
+	std::vector<reg_element_t> reg_elements;
+	std::string output_message;
 
 	// instructions props
 	float scroll_offset = 0.f;
@@ -81,19 +110,4 @@ public :
 	std::string logger_text;
 	void set_text(sf::Uint32 unicode);
 	bool logger_enabled = false;
-
-	// getters and setters
-	bool get_show_output() { return show_output; }
-	void set_show_output(bool output) { show_output = output; }
-	std::string get_output() { return output_message; }
-	void set_output(const std::string& msg) { output_message = msg; }
-	void clear_output() { output_message.clear(); }
-	bool has_output() const { return !output_message.empty(); }
-
-
-	std::vector<std::string> instruction_codes;
-	std::vector<instruction_element_t> instruction_elements;
-	std::vector<reg_element_t> reg_elements;
-	std::string output_message;
-
 };

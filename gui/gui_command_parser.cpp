@@ -22,14 +22,20 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
 
     std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 
+    if (std::find(commands.begin(), commands.end(), cmd) == commands.end()) {
+        gui_render.output_message = "Unknown command.\nPlease run \"help\" to see available command list.";
+    }
+
     if (cmd == "help") {
         std::ostringstream oss;
         oss << "=== CPUInsight Command List ===" << "\n";
-        oss << "help : Shows this message" << "\n";
-        oss << "load [filename] : Loads RISC-V Assembly file" << "\n";
-        oss << "stats : Shows statistics for executed instructions" << "\n";
-        oss << "leybindings : Shows current keybinding list" << "\n";
-        oss << "exit : Terminates the program" << "\n";
+        oss << "help            | Shows this message" << "\n";
+        oss << "load [filename] | Loads RISC-V Assembly file" << "\n";
+        oss << "stats           | Shows statistics for executed instructions" << "\n";
+        oss << "keybindings     | Shows current keybinding list" << "\n";
+        oss << "run             | Runs the loaded RISC-V Assembly file" << "\n";
+        oss << "stop            | Stops the current execution" << "\n";
+        oss << "exit            | Terminates the program" << "\n";
 
         gui_render.output_message = oss.str();
     }
@@ -42,17 +48,36 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
 
         if (filename.empty()) {
             std::cout << "ERROR: No filename!" << std::endl;
+            gui_render.output_message = "ERROR: No filename provided!";
+            gui_render.set_show_output(true);
             return;
         }
 
+        gui_render.set_parser_err(false);
         gui_render.instruction_codes.clear();
         cpu.reset();
-        cpu.load_program(parser.parse_program(filename, gui_render));
-        gui_render.update_instructions(cpu);
-        gui_render.update_registers(cpu);
 
-        gui_render.set_show_output(true);
-        gui_render.output_message = "Successfully loaded: " + filename;
+        try {
+            cpu.load_program(parser.parse_program(filename, gui_render));
+
+            if (gui_render.get_parser_err()) {
+                if (gui_render.output_message.empty()) {
+                    gui_render.output_message = "Couldn't find or parse the requested file.";
+                }
+                gui_render.set_show_output(true);
+                return;
+            }
+
+            gui_render.update_instructions(cpu);
+            gui_render.update_registers(cpu);
+            gui_render.set_show_output(true);
+            gui_render.output_message = "Successfully loaded: " + filename;
+
+        }
+        catch (const std::exception& e) {
+            gui_render.output_message = "Error loading file: " + std::string(e.what());
+            gui_render.set_show_output(true);
+        }
     }
 
    if (cmd == "stats") {
@@ -70,14 +95,29 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
    if (cmd == "keybindings") {
        std::ostringstream oss;
        oss << "=== CPUInsight Keybinding List ===" << "\n";
-       oss << "ArrowDown : Scrolls down in INSTRUCTION section" << "\n";
-       oss << "SpaceBar : Executes only one instruction" << "\n";
-       oss << "V : Enables / disables automatic execution" << "\n";
-       oss << "R : Resets the process" << "\n";
-       oss << "LShift : Increases auto CPU execution delay" << "\n";
-       oss << "LControl : Decreases auto CPU execution delay" << "\n";
+       oss << "ESC       | Switches between CLI and NAVIGATION modes" << "\n";
+       oss << "ArrowDown | Scrolls down in INSTRUCTION section" << "\n";
+       oss << "SpaceBar  | Executes only one instruction" << "\n";
+       oss << "V         | Enables / disables automatic execution" << "\n";
+       oss << "R         | Resets the process" << "\n";
+       oss << "LShift    | Increases auto CPU execution delay" << "\n";
+       oss << "LControl  | Decreases auto CPU execution delay" << "\n";
 
        gui_render.output_message = oss.str();
+   }
+
+   if (cmd == "run") {
+       gui_render.set_autorun(true);
+       gui_render.set_accumulator(0.f);
+
+       gui_render.output_message = "Running the instructions...";
+   }
+
+   if (cmd == "stop") {
+       gui_render.set_autorun(false);
+       gui_render.set_accumulator(0.f);
+
+       gui_render.output_message = "Stopped the process.";
    }
 
    if (cmd == "exit") {

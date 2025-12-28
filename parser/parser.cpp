@@ -17,8 +17,10 @@
 program_t&& parser_t::parse_program(const std::string& src, GUIRender& gui_render) {
 	std::ifstream file(src);
 	if (!file.is_open()) {
-		std::cout << "\033[31m" << "Error: \033" << "File path " << src << " doesn't exist.\n";
-		exit(EXIT_FAILURE);
+		std::cout << "\033[31m" << "Error: \033[0m" << "File path " << src << " doesn't exist.\n";
+		gui_render.set_parser_err(true);
+		gui_render.output_message = "Error: File '" + src + "' doesn't exist or cannot be opened.";
+		throw std::runtime_error("File not found: " + src);
 	}
 	std::string line_raw;
 	while (std::getline(file, line_raw)) {
