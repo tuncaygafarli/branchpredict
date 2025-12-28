@@ -45,7 +45,7 @@ public :
 	void draw_gui(sf::RenderWindow& window, CPU& cpu);
 	void draw_instructions(sf::RenderWindow& window);
 	void draw_reg_file(sf::RenderWindow& window, CPU& cpu);
-	void draw_logger(sf::RenderWindow& window, CPU& cpu);
+	void draw_prompt(sf::RenderWindow& window, CPU& cpu);
 	void draw_box(sf::RenderWindow& window,
 		const sf::Vector2f& position,
 		const sf::Vector2f& size,
@@ -62,6 +62,7 @@ public :
 	void ensure_visible(int index);
 	void ensure_register_visible(int reg_index);
 	void update_registers(CPU& cpu);
+	void update_instructions(CPU& cpu);
 
 
 	InputMode current_mode = InputMode::NAVIGATION;

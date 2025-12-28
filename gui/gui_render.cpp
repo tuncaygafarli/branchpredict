@@ -71,12 +71,23 @@ void GUIRender::update_registers(CPU& cpu) {
 	}
 }
 
+void GUIRender::update_instructions(CPU& cpu) {
+	instruction_elements.clear();
+	for (size_t i = 0; i < instruction_codes.size(); i++) {
+		instruction_elements.emplace_back(
+			sf::Color(35, 35, 40),
+			instruction_codes[i],
+			i == 0
+		);
+	}
+}
+
 void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu) {
 	draw_instructions(window);
 	draw_reg_file(window, cpu);
 
 	if (logger_enabled) {
-		draw_logger(window, cpu);
+		draw_prompt(window, cpu);
 	}
 }
 
@@ -234,7 +245,7 @@ void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
 		true);
 }
 
-void GUIRender::draw_logger(sf::RenderWindow& window, CPU& cpu) {
+void GUIRender::draw_prompt(sf::RenderWindow& window, CPU& cpu) {
 	// logger input field
 	float logger_panel_width = window.getSize().x / 2 - 2.f;
 	float logger_panel_height = 50.f;
@@ -269,7 +280,7 @@ void GUIRender::draw_logger(sf::RenderWindow& window, CPU& cpu) {
 	if (current_mode == InputMode::TEXT && static_cast<int>(cursor_clock.getElapsedTime().asSeconds() * 2) % 2 == 0) {
 		sf::RectangleShape cursor(sf::Vector2f(8, 24));
 		cursor.setFillColor(sf::Color::Black);
-		cursor.setPosition(cursor_x, cursor_y);
+		cursor.setPosition(cursor_x, cursor_y + 2.f);
 		window.draw(cursor);
 	}
 }
@@ -283,6 +294,7 @@ void GUIRender::set_text(sf::Uint32 unicode) {
 			logger_text.pop_back();
 		}
 	}
+
 }
 
 void GUIRender::add_instruction(const std::string& asm_code) {

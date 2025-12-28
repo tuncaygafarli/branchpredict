@@ -7,6 +7,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "gui/gui_render.h"
+#include "gui/gui_command_parser.h"
 
 #include "parser/parser.h"
 #include "cpu/cpu.h"
@@ -18,6 +19,7 @@ int main(int argc, char** argv) {
 
     // GUI TEST
     GUIRender gui_render;
+
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "BranchPredictor", sf::Style::Fullscreen);
 
     int selection_index = 0;
@@ -81,6 +83,7 @@ int main(int argc, char** argv) {
 
     parser_t parser;
     CPU cpu(predictor_type);
+    GUICommandParser gc_parser(gui_render, cpu, parser);
 
     cpu.load_program(parser.parse_program(input_file, gui_render));
     gui_render.init(cpu);
@@ -191,8 +194,9 @@ int main(int argc, char** argv) {
                 }
 
                 if (event.type == sf::Event::KeyPressed) {
-                    if (event.key.code == sf::Keyboard::A) {
-                        std::cout << "basim agriyir" << "\n";
+                    if (event.key.code == sf::Keyboard::Enter) {
+                        gc_parser.parse_and_execute(gui_render.logger_text);
+                        gui_render.logger_text.clear();
                     }
                 }
             }
