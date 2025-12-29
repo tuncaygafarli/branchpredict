@@ -17,6 +17,8 @@ public:
     const std::vector<std::string>& get_command_history() const { return command_history; }
     void add_command_history(const std::string& command) { command_history.push_back(command); }
 
+    std::string filename;
+
 private:
     CPU& cpu;
     GUIRender& gui_render;
@@ -24,6 +26,14 @@ private:
 
     bool exit_requested = false;
 
-    const std::vector<std::string> commands = { "load", "stats", "run", "stop", "help", "keybindings", "exit" };
+    const std::vector<std::string> commands = { 
+        "load",
+        "unload", 
+        "stats", 
+        "run", 
+        "stop", 
+        "help", 
+        "keybindings", 
+        "exit" };
     std::vector<std::string> command_history;
 };

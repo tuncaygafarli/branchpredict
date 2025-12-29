@@ -69,7 +69,6 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
 
     // load command
     if (cmd == "load") {
-        std::string filename;
         iss >> filename;
 
         if (filename.empty()) {
@@ -104,6 +103,23 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
             gui_render.output_message = "Error loading file: " + std::string(e.what());
             gui_render.set_show_output(true);
         }
+    }
+
+    if(cmd == "unload"){
+        if(filename.empty()){
+            gui_render.output_message = "No files are loaded!";
+            return;
+        }
+
+        cpu.reset();
+		gui_render.set_autorun(false);
+
+	    gui_render.update_registers(cpu);
+        gui_render.instruction_codes.clear();
+        gui_render.instruction_elements.clear();
+        filename.clear();
+
+        gui_render.output_message = "Successfully unloaded program.";
     }
 
     if (cmd == "mode") {
