@@ -25,48 +25,50 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
     if (std::find(commands.begin(), commands.end(), cmd) == commands.end()) {
         std::ostringstream err_oss;
         err_oss << "Unknown command \'" << cmd << "\'." << "\nRun \"help\" to see available command list." << "\n";
-        gui_render.output_message = err_oss.str();
+        gui_render.set_output_message(err_oss.str());
     }
 
     // help command
     if (cmd == "help") {
-        std::string page_num;
-        iss >> page_num;
-        std::ostringstream oss;
-
-        if(page_num.empty()){
-            oss << "=== CPUInsight Command List [1] ===" << "\n";
-            oss << "help [page]     | Shows this message" << "\n";
-            oss << "load [filename] | Loads RISC-V Assembly file" << "\n";
-            oss << "unload          | Unloads current RISC-V Assembly file" << "\n";
-            oss << "mode            | Sets current predictor mode" << "\n";
-            oss << "stats           | Shows statistics for executed instructions" << "\n";
-            oss << "keybindings     | Shows current keybinding list" << "\n";
-            oss << "run             | Runs the loaded RISC-V Assembly file" << "\n";
-            oss << "stop            | Stops the current execution" << "\n";
+    std::string page_num_str;
+    iss >> page_num_str;
+    std::ostringstream oss;
+    
+    int page_num = 1;
+    
+    if (!page_num_str.empty()) {
+        try {
+            page_num = std::stoi(page_num_str);
+            if (page_num > 2) {
+                gui_render.set_output_message("Tried to load unexisted page.");
+                return;
+            }
         }
-
-        else if(page_num == "1"){
-            oss << "=== CPUInsight Command List [1] ===" << "\n";
-            oss << "help [page]     | Shows this message" << "\n";
-            oss << "load [filename] | Loads RISC-V Assembly file" << "\n";
-            oss << "unload          | Unloads current RISC-V Assembly file" << "\n";
-            oss << "mode            | Sets current predictor mode" << "\n";
-            oss << "stats           | Shows statistics for executed instructions" << "\n";
-            oss << "keybindings     | Shows current keybinding list" << "\n";
-            oss << "run             | Runs the loaded RISC-V Assembly file" << "\n";
-            oss << "stop            | Stops the current execution" << "\n";
+        catch (const std::exception& e) {
+            gui_render.set_output_message("Invalid page number format.");
+            return;
         }
-
-        else if(page_num == "2"){
-            oss << "=== CPUInsight Command List [2] ===" << "\n";
-            oss << "delay           | Sets the autorun delay" << "\n";
-            oss << "exit            | Terminates the program" << "\n";
-        }
-
-
-        gui_render.output_message = oss.str();
     }
+    
+    if (page_num == 1) {
+        oss << "=== CPUInsight Command List [1] ===" << "\n";
+        oss << "help [page]     | Shows this message" << "\n";
+        oss << "load [filename] | Loads RISC-V Assembly file" << "\n";
+        oss << "unload          | Unloads current RISC-V Assembly file" << "\n";
+        oss << "mode            | Sets current predictor mode" << "\n";
+        oss << "stats           | Shows statistics for executed instructions" << "\n";
+        oss << "keybindings     | Shows current keybinding list" << "\n";
+        oss << "run             | Runs the loaded RISC-V Assembly file" << "\n";
+        oss << "stop            | Stops the current execution" << "\n";
+    }
+    else if (page_num == 2) {
+        oss << "=== CPUInsight Command List [2] ===" << "\n";
+        oss << "delay           | Sets the autorun delay" << "\n";
+        oss << "exit            | Terminates the program" << "\n";
+    }
+    
+    gui_render.set_output_message(oss.str());
+}
 
     // loads RISC-V assembly program
     if (cmd == "load") {
@@ -74,7 +76,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
 
         if (filename.empty()) {
             std::cout << "ERROR: No filename!" << std::endl;
-            gui_render.output_message = "ERROR: No filename provided!";
+            gui_render.set_output_message("ERROR: No filename provided!");
             gui_render.set_show_output(true);
             return;
         }
@@ -87,8 +89,8 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
             cpu.load_program(parser.parse_program(filename, gui_render));
 
             if (gui_render.get_parser_err()) {
-                if (gui_render.output_message.empty()) {
-                    gui_render.output_message = "Couldn't find or parse the requested file.";
+                if (gui_render.has_output_message()) {
+                    gui_render.set_output_message("Couldn't find or parse the requested file.");
                 }
                 gui_render.set_show_output(true);
                 return;
@@ -97,11 +99,11 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
             gui_render.update_instructions(cpu);
             gui_render.update_registers(cpu);
             gui_render.set_show_output(true);
-            gui_render.output_message = "Successfully loaded: " + filename;
+            gui_render.set_output_message("Successfully loaded: " + filename);
 
         }
         catch (const std::exception& e) {
-            gui_render.output_message = "Error loading file: " + std::string(e.what());
+            gui_render.set_output_message("Error loading file: " + std::string(e.what()));
             gui_render.set_show_output(true);
         }
     }
@@ -109,7 +111,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
     // unloads the current RISC-V assembly program
     if(cmd == "unload"){
         if(filename.empty()){
-            gui_render.output_message = "No files are loaded!";
+            gui_render.set_output_message("No files are loaded!");
             return;
         }
 
@@ -121,7 +123,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         gui_render.instruction_elements.clear();
         filename.clear();
 
-        gui_render.output_message = "Successfully unloaded program.";
+        gui_render.set_output_message("Successfully unloaded program.");
     }
 
     if(cmd == "delay"){
@@ -140,22 +142,22 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
 
         if (mode == "simple") {
             cpu.set_branch_predictor(CPU::PREDICTOR_TYPE::SIMPLE);
-            gui_render.output_message = "Predictor set to: Simple";
+            gui_render.set_output_message("Predictor set to: Simple");
         }
         else if (mode == "gag") {
             cpu.set_branch_predictor(CPU::PREDICTOR_TYPE::GAg);
-            gui_render.output_message = "Predictor set to: GAg";
+            gui_render.set_output_message("Predictor set to: GAg");
         }
         else if (mode == "pag") {
             cpu.set_branch_predictor(CPU::PREDICTOR_TYPE::PAg);
-            gui_render.output_message = "Predictor set to: PAg";
+            gui_render.set_output_message("Predictor set to: PAg");
         }
         else if (mode == "gshare") {
             cpu.set_branch_predictor(CPU::PREDICTOR_TYPE::GSHARE);
-            gui_render.output_message = "Predictor set to: GShare";
+            gui_render.set_output_message("Predictor set to: GShare");
         }
         else {
-            gui_render.output_message = "Unknown predictor. Available: simple, gag, pag, gshare";
+            gui_render.set_output_message("Unknown predictor. Available: simple, gag, pag, gshare");
         }
     }
 
@@ -168,7 +170,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
        oss << "Prediction accuracy: " << cpu.get_accuracy() * 100 << "%" << "\n";
        oss << "Cycles: " << cpu.get_cycles() << "\n";
 
-       gui_render.output_message = oss.str();
+       gui_render.set_output_message(oss.str());
     }
 
    // keybindings command
@@ -183,19 +185,19 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
        oss << "LShift    | Increases auto CPU execution delay" << "\n";
        oss << "LControl  | Decreases auto CPU execution delay" << "\n";
 
-       gui_render.output_message = oss.str();
+       gui_render.set_output_message(oss.str());
    }
 
    // run command
    if (cmd == "run") {
        if (gui_render.instruction_elements.size() == 0) {
-           gui_render.output_message = "Couldn't execute the instructions, please load a file first.";
+           gui_render.set_output_message("Couldn't execute the instructions, please load a file first.");
            return;
        }
        gui_render.set_autorun(true);
        gui_render.set_accumulator(0.f);
 
-       gui_render.output_message = "Running the instructions...";
+       gui_render.set_output_message("Running the instructions...");
    }
 
    // stop command
@@ -203,10 +205,10 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
        gui_render.set_autorun(false);
        gui_render.set_accumulator(0.f);
 
-       gui_render.output_message = "Stopped the process.";
+       gui_render.set_output_message("Stopped the process.");
    }
 
-   // exit command
+   //) exit command
    if (cmd == "exit") {
        exit_requested = true;
    }
