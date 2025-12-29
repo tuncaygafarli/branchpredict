@@ -60,12 +60,11 @@ void GUIRender::update_registers(CPU& cpu) {
 		const reg_id_t& reg_id = reg_pair.first;
 		const data_t& reg_data = reg_pair.second;
 
-		std::string reg_id_str = Helpers::id_t_to_string(reg_id);
 		std::string reg_data_str = Helpers::data_t_to_string(reg_data);
 
 		reg_elements.emplace_back(
 			sf::Color(45, 45, 50),
-			reg_id_str,
+			lookup_t::reg_name(reg_id),
 			reg_data_str
 		);
 	}
