@@ -37,6 +37,7 @@ private:
 	bool show_output = false;
 
 	bool autorun = false;
+	float autorun_delay = 0.5f;
     float accumulator = 0.f;
 
 	bool parser_err = false;
@@ -91,6 +92,10 @@ public :
 	void set_output(const std::string& msg) { output_message = msg; }
 	void clear_output() { output_message.clear(); }
 	bool has_output() const { return !output_message.empty(); }
+
+	// autorun delay
+	float get_autorun_delay() { return autorun_delay; }
+	void set_autorun_delay(float input) { autorun_delay = input; }
 
 	// autorun with accumulator
 	bool get_autorun() { return autorun; }

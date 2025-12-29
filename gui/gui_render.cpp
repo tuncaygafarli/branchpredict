@@ -456,7 +456,6 @@ void GUIRender::run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_par
 	bool cpu_halted = cpu.halt();
 
 	sf::Clock autorun_timer;
-	float autorun_delay = 0.5f;
 	int selection_index = 0;
 
 	int command_index = -1;

@@ -28,7 +28,8 @@ private:
 
     const std::vector<std::string> commands = { 
         "load",
-        "unload", 
+        "unload",
+        "delay", 
         "stats", 
         "run", 
         "stop", 

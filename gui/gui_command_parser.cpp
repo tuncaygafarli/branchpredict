@@ -60,6 +60,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
 
         else if(page_num == "2"){
             oss << "=== CPUInsight Command List [2] ===" << "\n";
+            oss << "delay           | Sets the autorun delay" << "\n";
             oss << "exit            | Terminates the program" << "\n";
         }
 
@@ -121,6 +122,14 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         filename.clear();
 
         gui_render.output_message = "Successfully unloaded program.";
+    }
+
+    if(cmd == "delay"){
+        float set_delay;
+        iss >> set_delay;
+
+        float delay = std::clamp(set_delay, 0.1f, 5.f);
+        gui_render.set_autorun_delay(delay);
     }
 
     // setting branch mode here
