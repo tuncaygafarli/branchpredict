@@ -19,7 +19,7 @@ This repository focuses on the **GUI frontend**, enabling interactive inspection
 
 ## Screenshots
 
-<img width="1920" height="1080" alt="Base Profile Screenshot 2025 12 29 - 04 57 13 16" src="https://github.com/user-attachments/assets/bc8e9dbb-7418-4664-985c-3e218342b99e" />
+<img width="1920" height="1080" alt="Base Profile Screenshot 2025 12 30 - 02 05 30 37" src="https://github.com/user-attachments/assets/287480d2-d916-4438-9d7c-96f0e713c3bd" />
 
 ## 🚀 Quick Start
 
