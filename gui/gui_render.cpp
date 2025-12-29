@@ -10,6 +10,7 @@
 #include "gui_command_parser.h"
 #include "../cpu/cpu.h"
 #include "helpers.h"
+#include "../parser/lookup.h"
 
 constexpr float HEADER_HEIGHT = 60.f;
 constexpr float LOGGER_HEIGHT = 20.f;
@@ -40,12 +41,11 @@ void GUIRender::init(CPU& cpu) {
 		const reg_id_t& reg_id = reg_pair.first;
 		const data_t& reg_data = reg_pair.second;
 
-		std::string reg_id_str = Helpers::id_t_to_string(reg_id);
 		std::string reg_data_str = Helpers::data_t_to_string(reg_data);
 
 		reg_elements.emplace_back(
 			sf::Color(45, 45, 50),
-			reg_id_str,
+			lookup_t::reg_name(reg_id),
 			reg_data_str
 		);
 	}
@@ -106,7 +106,8 @@ void GUIRender::draw_box(sf::RenderWindow& window,
 	bool center_text,
     bool borderline) {
 
-	sf::RectangleShape box(size);
+	static sf::RectangleShape box;
+	box.setSize(size);
 	box.setPosition(position);
 	box.setFillColor(bg_color);
 
@@ -154,7 +155,7 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 	scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
 
 	if (instruction_elements.size() == 0) {
-		sf::Text text_obj;
+		static sf::Text text_obj;
 		text_obj.setFont(font);
 		text_obj.setString("   Welcome to CPUInsight!\n\nPress ESC to enter CLI mode.");
 		text_obj.setCharacterSize(24);
@@ -288,7 +289,7 @@ void GUIRender::draw_prompt(sf::RenderWindow& window, CPU& cpu) {
 	float prompt_x = logger_panel_x + 10;
 	float cursor_y = logger_panel_y + 10;
 
-	sf::Text prompt_text;
+	static sf::Text prompt_text;
 	prompt_text.setFont(font);
 	prompt_text.setString(prompt_char);
 	prompt_text.setCharacterSize(24);
@@ -352,7 +353,7 @@ void GUIRender::draw_output(sf::RenderWindow& window, CPU& cpu) {
 		float line_y = output_y + 10;
 
 		while (std::getline(ss, line)) {
-			sf::Text line_text;
+			static sf::Text line_text;
 			line_text.setFont(font);
 			line_text.setString(line);
 			line_text.setCharacterSize(22);
@@ -455,7 +456,7 @@ void GUIRender::run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_par
 	set_mode(GUIRender::InputMode::NAVIGATION);
 	bool cpu_halted = cpu.halt();
 
-	sf::Clock autorun_timer;
+	static sf::Clock autorun_timer;
 	int selection_index = 0;
 
 	int command_index = -1;
