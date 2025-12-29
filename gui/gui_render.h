@@ -27,6 +27,16 @@ private:
 		}
 	};
 
+	struct mem_element_t {
+		sf::Color bg_color;
+		std::string MEM_ADDR;
+		std::string MEM_DATA;
+
+		mem_element_t(sf::Color color, const std::string& mem_addr, const std::string& mem_data)
+			: bg_color(color), MEM_ADDR(mem_addr), MEM_DATA(mem_data) {
+		}
+	};
+
 	sf::Font font;
 	bool font_loaded = false;
 
@@ -58,6 +68,7 @@ public :
 	void draw_gui(sf::RenderWindow& window, CPU& cpu);
 	void draw_instructions(sf::RenderWindow& window);
 	void draw_reg_file(sf::RenderWindow& window, CPU& cpu);
+	void draw_memory(sf::RenderWindow& window, CPU& cpu);
 	void draw_prompt(sf::RenderWindow& window, CPU& cpu);
 	void draw_output(sf::RenderWindow& window, CPU& cpu);
 	void draw_box(sf::RenderWindow& window,
@@ -74,10 +85,14 @@ public :
 	void set_selection(int& selectionIndex);
 	void scroll(float amount);
 	void scroll_registers(float amount);
+	void scroll_memory(float amount);
 	void ensure_visible(int index);
 	void ensure_register_visible(int reg_index);
+	void ensure_memory_visible(int mem_index);
 	void update_registers(CPU& cpu);
 	void update_instructions(CPU& cpu);
+	void update_memory(CPU& cpu);
+
 
 	void run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_parser);
 	void send_parser_err(const std::string& message);
@@ -112,10 +127,14 @@ public :
 	std::vector<std::string> instruction_codes;
 	std::vector<instruction_element_t> instruction_elements;
 	std::vector<reg_element_t> reg_elements;
+	std::vector<mem_element_t> mem_elements;
 
 	// instructions props
 	float scroll_offset = 0.f;
 	float visible_height = 0.f;
+
+	// memory props
+	float memory_scroll_offset = 0.f;	
 
 	// logger props
 	std::string logger_text;

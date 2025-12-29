@@ -5,6 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <string>
+#include <iomanip>
 
 #include "gui_render.h"
 #include "gui_command_parser.h"
@@ -28,6 +29,7 @@ GUIRender::GUIRender() {
 // external initializer
 void GUIRender::init(CPU& cpu) {
 	const reg_file_t& reg_file = cpu.get_reg_file();
+	const d_cache_t& d_cache = cpu.get_d_cache();
 
 	for (size_t i = 0; i < instruction_codes.size(); i++) {
 		instruction_elements.emplace_back(
@@ -82,9 +84,35 @@ void GUIRender::update_instructions(CPU& cpu) {
 	}
 }
 
+void GUIRender::update_memory(CPU& cpu) {
+    mem_elements.clear();
+    
+    const d_cache_t& d_cache = cpu.get_d_cache();
+    
+    for (const auto& [address, data] : d_cache) {
+        std::string addr_str;
+        
+        std::stringstream addr_ss;
+        addr_ss << "0x" << std::hex << std::uppercase
+                << std::setw(16) << std::setfill('0') 
+                << static_cast<uint64_t>(address);
+        
+        addr_str = addr_ss.str();
+        
+        std::string data_str = std::to_string(data._signed);
+        
+        mem_elements.emplace_back(
+            sf::Color(50, 50, 55),
+            addr_str,
+            data_str
+        );
+    }
+}
+
 void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu) {
 	draw_instructions(window);
 	draw_reg_file(window, cpu);
+	draw_memory(window, cpu);
 
 	if (logger_enabled) {
 		draw_prompt(window, cpu);
@@ -202,41 +230,31 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 }
 
 void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
-    // Use the same visible height as assembly instructions
-    float visible_area_height = visible_height;  // window.getSize().y / 2
+    float visible_area_height = static_cast<float>(window.getSize().y / 2);
     
-    // Register panel starts at middle of screen
     float reg_id_panel_x = window.getSize().x / 2;
     float reg_data_panel_x = 3 * window.getSize().x / 4;
     
-    // Register panel width is 1/4 of screen
     float reg_id_panel_width = window.getSize().x / 4;
     float reg_data_panel_width = window.getSize().x / 4;
     
-    // Calculate row height to match assembly instructions
     float content_height = visible_area_height - HEADER_HEIGHT;
-    float register_row_height = content_height / 8;  // Same as instruction_box_height
+    float register_row_height = content_height / 8;
     
-    // Start position for register content (below header)
     float reg_content_start_y = HEADER_HEIGHT - register_scroll_offset;
     
-    // Register panel height (for each row)
     float reg_id_panel_height = register_row_height;
     float reg_data_panel_height = register_row_height;
     
-    // scroll bounds - use the same visible area as assembly
     float total_registers_height = reg_elements.size() * register_row_height;
     float max_register_scroll = std::max(0.f, total_registers_height - content_height);
     register_scroll_offset = std::clamp(register_scroll_offset, 0.f, max_register_scroll);
     
-    // Draw registers
     for (int i = 0; i < reg_elements.size(); i++) {
         float reg_id_y_pos = reg_content_start_y + i * reg_id_panel_height;
         float reg_data_y_pos = reg_content_start_y + i * reg_data_panel_height;
         
-        // Skip if above visible area
         if (reg_id_y_pos + reg_id_panel_height < HEADER_HEIGHT) continue;
-        // Break if below visible area
         if (reg_id_y_pos > visible_area_height) break;
         
         // register ID box
@@ -256,7 +274,7 @@ void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
             sf::Color::White);
     }
     
-    // REG_ID header - KEEP THIS EXACTLY AS IS!
+    // REG_ID header
     draw_box(window,
         sf::Vector2f(window.getSize().x / 2, 0.f),
         sf::Vector2f(window.getSize().x / 4, HEADER_HEIGHT),
@@ -266,7 +284,7 @@ void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
         24,
         true);
     
-    // REG_DATA header - KEEP THIS EXACTLY AS IS!
+    // REG_DATA header
     draw_box(window,
         sf::Vector2f(3 * window.getSize().x / 4, 0.f),
         sf::Vector2f(window.getSize().x / 4, HEADER_HEIGHT),
@@ -275,6 +293,96 @@ void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
         sf::Color::Black,
         24,
         true);
+}
+
+void GUIRender::draw_memory(sf::RenderWindow& window, CPU& cpu) {
+    float visible_area_height = static_cast<float>(window.getSize().y / 2) + 60.f;
+    
+    float mem_addr_panel_x = window.getSize().x / 2;
+    float mem_data_panel_x = 3 * window.getSize().x / 4;
+    
+    float mem_addr_panel_width = window.getSize().x / 4;
+    float mem_data_panel_width = window.getSize().x / 4;
+    
+    float mem_panel_start_y = visible_area_height;
+    
+    float prompt_height = window.getSize().y / 20;
+    float memory_content_height = window.getSize().y - mem_panel_start_y - prompt_height;
+    
+    float memory_row_height = memory_content_height / 7;
+    
+    float mem_content_start_y = mem_panel_start_y + HEADER_HEIGHT - memory_scroll_offset;
+    
+    float mem_addr_panel_height = memory_row_height;
+    float mem_data_panel_height = memory_row_height;
+    
+    float total_memory_height = mem_elements.size() * memory_row_height;
+    float max_memory_scroll = std::max(0.f, total_memory_height - memory_content_height);
+    memory_scroll_offset = std::clamp(memory_scroll_offset, 0.f, max_memory_scroll);
+    
+    float memory_section_top = mem_panel_start_y + HEADER_HEIGHT;
+    float memory_section_bottom = memory_section_top + memory_content_height;
+    
+    for (int i = 0; i < mem_elements.size(); i++) {
+        float mem_addr_y_pos = mem_content_start_y + i * mem_addr_panel_height;
+        float mem_data_y_pos = mem_content_start_y + i * mem_data_panel_height;
+        
+        if (mem_addr_y_pos + mem_addr_panel_height < memory_section_top) continue;
+        if (mem_addr_y_pos > memory_section_bottom) break;
+        
+        draw_box(window,
+            sf::Vector2f(mem_addr_panel_x, mem_addr_y_pos),
+            sf::Vector2f(mem_addr_panel_width, mem_addr_panel_height),
+            mem_elements[i].bg_color,
+            mem_elements[i].MEM_ADDR,
+            sf::Color::White);
+        
+        draw_box(window,
+            sf::Vector2f(mem_data_panel_x, mem_data_y_pos),
+            sf::Vector2f(mem_data_panel_width, mem_data_panel_height),
+            mem_elements[i].bg_color,
+            mem_elements[i].MEM_DATA,
+            sf::Color::White);
+    }
+    
+    draw_box(window,
+        sf::Vector2f(window.getSize().x / 2, mem_panel_start_y),
+        sf::Vector2f(window.getSize().x / 4, HEADER_HEIGHT),
+        sf::Color::White,
+        "MEM_ADDR",
+        sf::Color::Black,
+        24,
+        true,
+        false);
+    
+    draw_box(window,
+        sf::Vector2f(3 * window.getSize().x / 4, mem_panel_start_y),
+        sf::Vector2f(window.getSize().x / 4, HEADER_HEIGHT),
+        sf::Color::White,
+        "MEM_DATA",
+        sf::Color::Black,
+        24,
+        true,
+        false);
+    
+    if (mem_elements.empty()) {
+        sf::Text debug_text;
+        debug_text.setFont(font);
+        debug_text.setString("EMPTY MEMORY");
+        debug_text.setCharacterSize(24);
+        debug_text.setFillColor(sf::Color::Red);
+        
+        float memory_center_x = mem_addr_panel_x + (mem_addr_panel_width + mem_data_panel_width) / 2;
+        float memory_center_y = mem_panel_start_y + HEADER_HEIGHT + (memory_content_height / 2);
+        
+        sf::FloatRect textBounds = debug_text.getLocalBounds();
+        debug_text.setPosition(
+            memory_center_x - textBounds.width / 2,
+            memory_center_y - textBounds.height / 2
+        );
+        
+        window.draw(debug_text);
+    }
 }
 
 void GUIRender::draw_prompt(sf::RenderWindow& window, CPU& cpu) {
@@ -458,6 +566,41 @@ void GUIRender::ensure_register_visible(int reg_index) {
     register_scroll_offset = std::clamp(register_scroll_offset, 0.f, max_scroll);
 }
 
+void GUIRender::scroll_memory(float amount) {
+    memory_scroll_offset += amount;
+    
+    float visible_area_height = visible_height;
+    float content_height = visible_area_height - HEADER_HEIGHT;
+    float memory_row_height = content_height / 8;
+    
+    float total_memory_height = mem_elements.size() * memory_row_height;
+    float max_scroll = std::max(0.f, total_memory_height - content_height);
+    
+    memory_scroll_offset = std::clamp(memory_scroll_offset, 0.f, max_scroll);
+}
+
+void GUIRender::ensure_memory_visible(int mem_index) {
+    if (mem_index < 0 || mem_index >= static_cast<int>(mem_elements.size())) return;
+    
+    float visible_area_height = visible_height;
+    float content_height = visible_area_height - HEADER_HEIGHT;
+    float memory_row_height = content_height / 8;
+    
+    float item_top = mem_index * memory_row_height;
+    float item_bottom = item_top + memory_row_height;
+    
+    if (item_top < memory_scroll_offset) {
+        memory_scroll_offset = item_top;
+    }
+    else if (item_bottom > memory_scroll_offset + content_height) {
+        memory_scroll_offset = item_bottom - content_height;
+    }
+    
+    float total_memory_height = mem_elements.size() * memory_row_height;
+    float max_scroll = std::max(0.f, total_memory_height - content_height);
+    memory_scroll_offset = std::clamp(memory_scroll_offset, 0.f, max_scroll);
+}
+
 void GUIRender::send_parser_err(const std::string& message) {
 	output_message = message;
 }
@@ -520,10 +663,12 @@ void GUIRender::run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_par
 
 					if (event.key.code == sf::Keyboard::Right) {
 						scroll_registers(visible_height);
+						scroll_memory(visible_height);  
 					}
 
 					if (event.key.code == sf::Keyboard::Left) {
 						scroll_registers(-visible_height);
+						scroll_memory(-visible_height);  
 					}
 
 					if (event.key.code == sf::Keyboard::Space) {
@@ -532,6 +677,7 @@ void GUIRender::run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_par
 							cpu_halted = cpu.halt();
 
 							update_registers(cpu);
+							update_memory(cpu);
 
 							selection_index = cpu.get_pc();
 							set_selection(selection_index);
@@ -625,6 +771,7 @@ void GUIRender::run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_par
 				cpu_halted = cpu.halt();
 
 				update_registers(cpu);
+				update_memory(cpu);
 				selection_index = cpu.get_pc();
 				set_selection(selection_index);
 				ensure_visible(selection_index);

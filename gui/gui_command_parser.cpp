@@ -121,6 +121,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
 	    gui_render.update_registers(cpu);
         gui_render.instruction_codes.clear();
         gui_render.instruction_elements.clear();
+        gui_render.mem_elements.clear();
         filename.clear();
 
         gui_render.set_output_message("Successfully unloaded program.");

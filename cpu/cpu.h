@@ -41,6 +41,8 @@ public:
 	const std::unique_ptr<branch_predictor_t>& get_branch_predictor() { return _branch_predictor; }
 	void set_branch_predictor(PREDICTOR_TYPE type);
 
+    const d_cache_t& get_d_cache() { return _d_cache; }
+
 private:
 	bool _halt = false;
 	memory_addr_t _pc = 0; // program counter
