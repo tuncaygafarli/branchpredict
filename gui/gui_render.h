@@ -64,7 +64,8 @@ public :
 		const std::string& text,
 		const sf::Color& text_color,
 		unsigned int text_size = 24,
-		bool center_text = true);
+		bool center_text = true,
+		bool borderline = true);
 
 	void add_instruction(const std::string& asm_code);
 	void set_selection(int& selectionIndex);

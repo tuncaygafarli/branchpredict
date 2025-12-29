@@ -103,12 +103,16 @@ void GUIRender::draw_box(sf::RenderWindow& window,
 	const std::string& text,
 	const sf::Color& text_color,
 	unsigned int text_size,
-	bool center_text) {
+	bool center_text,
+    bool borderline) {
 
 	sf::RectangleShape box(size);
 	box.setPosition(position);
 	box.setFillColor(bg_color);
-	box.setOutlineThickness(2.f);
+
+	if(borderline){
+    	box.setOutlineThickness(2.f);
+	}
 	window.draw(box);
 
 	if (!text.empty()) {
@@ -193,7 +197,8 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 		"ASSEMBLY",
 		sf::Color::Black,
 		24,
-		true);
+		true,
+		false);
 }
 
 void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
@@ -324,7 +329,6 @@ void GUIRender::set_text(sf::Uint32 unicode) {
 			logger_text.pop_back();
 		}
 	}
-
 }
 
 void GUIRender::draw_output(sf::RenderWindow& window, CPU& cpu) {
@@ -379,7 +383,6 @@ void GUIRender::set_selection(int& selectionIndex) {
 }
 
 void GUIRender::scroll(float amount) {
-	const float HEADER_HEIGHT = 60.f;
 	const float content_height = visible_height - HEADER_HEIGHT;
 	const float INSTRUCTION_HEIGHT = content_height / 8;
 
@@ -394,7 +397,6 @@ void GUIRender::scroll(float amount) {
 void GUIRender::ensure_visible(int index) {
 	if (index < 0 || index >= static_cast<int>(instruction_elements.size())) return;
 
-	const float HEADER_HEIGHT = 60.f;
 	const float content_height = visible_height - HEADER_HEIGHT;
 	const float INSTRUCTION_HEIGHT = content_height / 8;
 
