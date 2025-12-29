@@ -1,0 +1,85 @@
+name: CMake on multiple platforms
+
+on:
+  push:
+    branches: [ "gui" ]
+  pull_request:
+    branches: [ "gui" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        build_type: [Release]
+        include:
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
+            # On Windows, we'll use dynamic linking for SFML
+            sfml_static: "OFF"
+          - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+            sfml_static: "ON"
+        exclude:
+          # Remove configurations that don't make sense
+          - os: windows-latest
+            c_compiler: gcc
+          - os: windows-latest
+            c_compiler: clang
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive  # Important if you use git submodules
+
+    - name: Install Linux Dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libxrandr-dev \
+          libxcursor-dev \
+          libxi-dev \
+          libudev-dev \
+          libopenal-dev \
+          libflac-dev \
+          libvorbis-dev \
+          libgl1-mesa-dev \
+          libfreetype6-dev
+
+    - name: Install Windows Dependencies
+      if: runner.os == 'Windows'
+      run: |
+        # Download SFML 2.6.1 for Windows
+        curl -L -o sfml.zip https://www.sfml-dev.org/files/SFML-2.6.1-windows-vc17-64-bit.zip
+        7z x sfml.zip -o"${{ github.workspace }}/vendor"
+        # Rename to match your expected path
+        mv "${{ github.workspace }}/vendor/SFML-2.6.1-windows-vc17-64-bit" "${{ github.workspace }}/vendor/SFML-2.6.1"
+
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+          -DCMAKE_CXX_COMPILER="${{ matrix.cpp_compiler }}" \
+          -DCMAKE_C_COMPILER="${{ matrix.c_compiler }}" \
+          -DCMAKE_BUILD_TYPE="${{ matrix.build_type }}" \
+          -DBUILD_SHARED_LIBS="${{ matrix.sfml_static }}" \
+          -DBUILD_TESTS=OFF \
+          -S .
+
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }}
+
+    - name: Test (Linux only)
+      if: runner.os == 'Linux'  # Windows tests may need DLLs
+      working-directory: build
+      run: |
+        if [ -f "bin/CPUINSIGHT" ]; then
+          ./bin/CPUINSIGHT --version || true
+        fi
+        # Run tests if you have them
+        # ctest --output-on-failure
