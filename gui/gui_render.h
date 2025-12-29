@@ -40,6 +40,8 @@ private:
 	float autorun_delay = 0.5f;
     float accumulator = 0.f;
 
+	std::string output_message;
+
 	bool parser_err = false;
 
 public :
@@ -88,10 +90,10 @@ public :
 	void set_show_output(bool output) { show_output = output; }
 
 	// output message
-	std::string get_output() { return output_message; }
-	void set_output(const std::string& msg) { output_message = msg; }
-	void clear_output() { output_message.clear(); }
-	bool has_output() const { return !output_message.empty(); }
+	std::string get_output_message() { return output_message; }
+	void set_output_message(const std::string& msg) { output_message = msg; }
+	void clear_output_message() { output_message.clear(); }
+	bool has_output_message() const { return !output_message.empty(); }
 
 	// autorun delay
 	float get_autorun_delay() { return autorun_delay; }
@@ -110,7 +112,6 @@ public :
 	std::vector<std::string> instruction_codes;
 	std::vector<instruction_element_t> instruction_elements;
 	std::vector<reg_element_t> reg_elements;
-	std::string output_message;
 
 	// instructions props
 	float scroll_offset = 0.f;

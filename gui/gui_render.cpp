@@ -202,71 +202,79 @@ void GUIRender::draw_instructions(sf::RenderWindow& window) {
 }
 
 void GUIRender::draw_reg_file(sf::RenderWindow& window, CPU& cpu) {
-	register_row_height = window.getSize().y / 20.f;
-	visible_registers_count = static_cast<int>((window.getSize().y - register_row_height) / register_row_height);
-	float REG_CONST_HEIGHT = window.getSize().y / 20;
-
-	// Register positions
-	float reg_id_panel_x = window.getSize().x / 2;
-	float reg_id_panel_y = REG_CONST_HEIGHT - register_scroll_offset;
-	float reg_id_panel_width = window.getSize().x / 4;
-	float reg_id_panel_height = window.getSize().y / 20;
-
-	float reg_data_panel_x = 3 * window.getSize().x / 4;
-	float reg_data_panel_y = REG_CONST_HEIGHT - register_scroll_offset;
-	float reg_data_panel_width = window.getSize().x / 4;
-	float reg_data_panel_height = window.getSize().y / 20;
-
-	// scroll bounds
-	float total_registers_height = reg_elements.size() * register_row_height;
-	float max_register_scroll = std::max(0.f, total_registers_height -
-		(window.getSize().y - register_row_height));
-	register_scroll_offset = std::clamp(register_scroll_offset, 0.f, max_register_scroll);
-
-	// registers
-	for (int i = 0; i < reg_elements.size(); i++) {
-		float reg_id_y_pos = reg_id_panel_y + i * reg_id_panel_height;
-		float reg_data_y_pos = reg_data_panel_y + i * reg_data_panel_height;
-
-		if (reg_id_y_pos + reg_id_panel_height < register_row_height) continue;
-		if (reg_id_y_pos > window.getSize().y) break;
-
-		// register ID box
-		draw_box(window,
-			sf::Vector2f(reg_id_panel_x, reg_id_y_pos),
-			sf::Vector2f(reg_id_panel_width, reg_id_panel_height),
-			reg_elements[i].bg_color,
-			reg_elements[i].REG_ID,
-			sf::Color::White);
-
-		// register DATA box
-		draw_box(window,
-			sf::Vector2f(reg_data_panel_x, reg_data_y_pos),
-			sf::Vector2f(reg_data_panel_width, reg_data_panel_height),
-			reg_elements[i].bg_color,
-			reg_elements[i].REG_DATA,
-			sf::Color::White);
-	}
-
-	// REG_ID header
-	draw_box(window,
-		sf::Vector2f(window.getSize().x / 2, 0.f),
-		sf::Vector2f(window.getSize().x / 4, HEADER_HEIGHT),
-		sf::Color::White,
-		"REG_ID",
-		sf::Color::Black,
-		24,
-		true);
-
-	// REG_DATA header
-	draw_box(window,
-		sf::Vector2f(3 * window.getSize().x / 4, 0.f),
-		sf::Vector2f(window.getSize().x / 4, HEADER_HEIGHT),
-		sf::Color::White,
-		"REG_DATA",
-		sf::Color::Black,
-		24,
-		true);
+    // Use the same visible height as assembly instructions
+    float visible_area_height = visible_height;  // window.getSize().y / 2
+    
+    // Register panel starts at middle of screen
+    float reg_id_panel_x = window.getSize().x / 2;
+    float reg_data_panel_x = 3 * window.getSize().x / 4;
+    
+    // Register panel width is 1/4 of screen
+    float reg_id_panel_width = window.getSize().x / 4;
+    float reg_data_panel_width = window.getSize().x / 4;
+    
+    // Calculate row height to match assembly instructions
+    float content_height = visible_area_height - HEADER_HEIGHT;
+    float register_row_height = content_height / 8;  // Same as instruction_box_height
+    
+    // Start position for register content (below header)
+    float reg_content_start_y = HEADER_HEIGHT - register_scroll_offset;
+    
+    // Register panel height (for each row)
+    float reg_id_panel_height = register_row_height;
+    float reg_data_panel_height = register_row_height;
+    
+    // scroll bounds - use the same visible area as assembly
+    float total_registers_height = reg_elements.size() * register_row_height;
+    float max_register_scroll = std::max(0.f, total_registers_height - content_height);
+    register_scroll_offset = std::clamp(register_scroll_offset, 0.f, max_register_scroll);
+    
+    // Draw registers
+    for (int i = 0; i < reg_elements.size(); i++) {
+        float reg_id_y_pos = reg_content_start_y + i * reg_id_panel_height;
+        float reg_data_y_pos = reg_content_start_y + i * reg_data_panel_height;
+        
+        // Skip if above visible area
+        if (reg_id_y_pos + reg_id_panel_height < HEADER_HEIGHT) continue;
+        // Break if below visible area
+        if (reg_id_y_pos > visible_area_height) break;
+        
+        // register ID box
+        draw_box(window,
+            sf::Vector2f(reg_id_panel_x, reg_id_y_pos),
+            sf::Vector2f(reg_id_panel_width, reg_id_panel_height),
+            reg_elements[i].bg_color,
+            reg_elements[i].REG_ID,
+            sf::Color::White);
+        
+        // register DATA box
+        draw_box(window,
+            sf::Vector2f(reg_data_panel_x, reg_data_y_pos),
+            sf::Vector2f(reg_data_panel_width, reg_data_panel_height),
+            reg_elements[i].bg_color,
+            reg_elements[i].REG_DATA,
+            sf::Color::White);
+    }
+    
+    // REG_ID header - KEEP THIS EXACTLY AS IS!
+    draw_box(window,
+        sf::Vector2f(window.getSize().x / 2, 0.f),
+        sf::Vector2f(window.getSize().x / 4, HEADER_HEIGHT),
+        sf::Color::White,
+        "REG_ID",
+        sf::Color::Black,
+        24,
+        true);
+    
+    // REG_DATA header - KEEP THIS EXACTLY AS IS!
+    draw_box(window,
+        sf::Vector2f(3 * window.getSize().x / 4, 0.f),
+        sf::Vector2f(window.getSize().x / 4, HEADER_HEIGHT),
+        sf::Color::White,
+        "REG_DATA",
+        sf::Color::Black,
+        24,
+        true);
 }
 
 void GUIRender::draw_prompt(sf::RenderWindow& window, CPU& cpu) {
@@ -416,33 +424,38 @@ void GUIRender::ensure_visible(int index) {
 }
 
 void GUIRender::scroll_registers(float amount) {
-	register_scroll_offset += amount;
-
-	// Calculate bounds
-	float total_registers_height = reg_elements.size() * register_row_height;
-	float max_scroll = std::max(0.f, total_registers_height -
-		(visible_height * 2 - register_row_height));  // Full window height
-
-	register_scroll_offset = std::clamp(register_scroll_offset, 0.f, max_scroll);
+    register_scroll_offset += amount;
+    
+    float visible_area_height = visible_height;
+    float content_height = visible_area_height - HEADER_HEIGHT;
+    float register_row_height = content_height / 8;
+    
+    float total_registers_height = reg_elements.size() * register_row_height;
+    float max_scroll = std::max(0.f, total_registers_height - content_height);
+    
+    register_scroll_offset = std::clamp(register_scroll_offset, 0.f, max_scroll);
 }
 
 void GUIRender::ensure_register_visible(int reg_index) {
-	if (reg_index < 0 || reg_index >= static_cast<int>(reg_elements.size())) return;
-
-	float item_top = reg_index * register_row_height;
-	float item_bottom = item_top + register_row_height;
-	float visible_area_height = visible_height * 2 - register_row_height;
-
-	if (item_top < register_scroll_offset) {
-		register_scroll_offset = item_top;
-	}
-	else if (item_bottom > register_scroll_offset + visible_area_height) {
-		register_scroll_offset = item_bottom - visible_area_height;
-	}
-
-	float total_registers_height = reg_elements.size() * register_row_height;
-	float max_scroll = std::max(0.f, total_registers_height - visible_area_height);
-	register_scroll_offset = std::clamp(register_scroll_offset, 0.f, max_scroll);
+    if (reg_index < 0 || reg_index >= static_cast<int>(reg_elements.size())) return;
+    
+    float visible_area_height = visible_height;
+    float content_height = visible_area_height - HEADER_HEIGHT;
+    float register_row_height = content_height / 8;
+    
+    float item_top = reg_index * register_row_height;
+    float item_bottom = item_top + register_row_height;
+    
+    if (item_top < register_scroll_offset) {
+        register_scroll_offset = item_top;
+    }
+    else if (item_bottom > register_scroll_offset + content_height) {
+        register_scroll_offset = item_bottom - content_height;
+    }
+    
+    float total_registers_height = reg_elements.size() * register_row_height;
+    float max_scroll = std::max(0.f, total_registers_height - content_height);
+    register_scroll_offset = std::clamp(register_scroll_offset, 0.f, max_scroll);
 }
 
 void GUIRender::send_parser_err(const std::string& message) {
