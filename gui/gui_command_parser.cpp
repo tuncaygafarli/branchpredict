@@ -38,24 +38,24 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
             oss << "=== CPUInsight Command List [1] ===" << "\n";
             oss << "help [page]     | Shows this message" << "\n";
             oss << "load [filename] | Loads RISC-V Assembly file" << "\n";
+            oss << "unload          | Resets current process <<" << "\n";
             oss << "mode            | Sets current predictor mode" << "\n";
             oss << "stats           | Shows statistics for executed instructions" << "\n";
             oss << "keybindings     | Shows current keybinding list" << "\n";
             oss << "run             | Runs the loaded RISC-V Assembly file" << "\n";
             oss << "stop            | Stops the current execution" << "\n";
-            oss << "exit            | Terminates the program" << "\n";
         }
 
         else if(page_num == "1"){
             oss << "=== CPUInsight Command List [1] ===" << "\n";
             oss << "help [page]     | Shows this message" << "\n";
             oss << "load [filename] | Loads RISC-V Assembly file" << "\n";
+            oss << "unload          | Resets current process <<" << "\n";
             oss << "mode            | Sets current predictor mode" << "\n";
             oss << "stats           | Shows statistics for executed instructions" << "\n";
             oss << "keybindings     | Shows current keybinding list" << "\n";
             oss << "run             | Runs the loaded RISC-V Assembly file" << "\n";
             oss << "stop            | Stops the current execution" << "\n";
-            oss << "dismiss         | Resets current process <<" << "\n";
         }
 
         else if(page_num == "2"){
@@ -67,7 +67,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         gui_render.output_message = oss.str();
     }
 
-    // load command
+    // loads RISC-V assembly program
     if (cmd == "load") {
         iss >> filename;
 
@@ -105,6 +105,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         }
     }
 
+    // unloads the current RISC-V assembly program
     if(cmd == "unload"){
         if(filename.empty()){
             gui_render.output_message = "No files are loaded!";
@@ -122,6 +123,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         gui_render.output_message = "Successfully unloaded program.";
     }
 
+    // setting branch mode here
     if (cmd == "mode") {
         std::string mode;
         iss >> mode;
