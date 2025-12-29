@@ -35,8 +35,8 @@ A graphical interface for simulating and visualizing CPU branch prediction algor
 #### Windows (Command Prompt/PowerShell)
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/CPUINSIGHT.git
-cd CPUINSIGHT
+git clone https://github.com/tuncaygafarli/cpuinsight.git
+cd cpuinsight
 
 # Create build directory
 mkdir build
@@ -55,8 +55,8 @@ CPUINSIGHT.exe
 #### Linux/Mac
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/CPUINSIGHT.git
-cd CPUINSIGHT
+git clone https://github.com/tuncaygafarli/cpuinsight.git
+cd cpuinsight
 
 # Create build directory
 mkdir build
@@ -103,7 +103,7 @@ echo -e "\nRunning CPUINSIGHT..."
 
 ## Project Structure
 ```
-CPUINSIGHT/
+cpuinsight/
 ├── build/                    # Build directory (generated)
 ├── vendor/                  # Dependencies (SFML)
 ├── src/
