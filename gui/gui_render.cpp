@@ -46,7 +46,7 @@ void GUIRender::init(CPU& cpu) {
 		reg_elements.emplace_back(
 			sf::Color(45, 45, 50),
 			lookup_t::reg_name(reg_id),
-			reg_data_str
+			std::move(reg_data_str)
 		);
 	}
 }
@@ -65,7 +65,7 @@ void GUIRender::update_registers(CPU& cpu) {
 		reg_elements.emplace_back(
 			sf::Color(45, 45, 50),
 			lookup_t::reg_name(reg_id),
-			reg_data_str
+			std::move(reg_data_str)
 		);
 	}
 }
