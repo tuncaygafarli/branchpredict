@@ -1,58 +1,43 @@
-name: CMake Build
+name: Fast CMake Build
 
 on:
   push:
-    branches: [ "gui", "main" ]
+    branches: [ "gui" ]
   pull_request:
-    branches: [ "gui", "main" ]
+    branches: [ "gui" ]
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
-        include:
-          - os: ubuntu-latest
-            c_compiler: gcc
-            cpp_compiler: g++
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
+    runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
     
-    - name: Install Linux dependencies
-      if: runner.os == 'Linux'
+    - name: Cache SFML
+      uses: actions/cache@v3
+      id: cache-sfml
+      with:
+        path: |
+          ~/.cache/sfml
+          build/_deps
+        key: ${{ runner.os }}-sfml-2.6.1-${{ hashFiles('CMakeLists.txt') }}
+    
+    - name: Install system SFML (FASTEST)
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-          libxrandr-dev \
-          libxcursor-dev \
-          libxi-dev \
-          libudev-dev \
-          libopenal-dev \
-          libflac-dev \
-          libvorbis-dev \
-          libgl1-mesa-dev \
-          libfreetype6-dev \
-          cmake \
-          g++
+        sudo apt-get install -y libsfml-dev  # Use pre-built system package
     
     - name: Configure CMake
-      shell: bash
       run: |
         cmake -B build \
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
-          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+          -DCMAKE_BUILD_TYPE=Release \
           -DBUILD_TESTS=OFF \
+          # Try to use system SFML first
+          -DSFML_DIR=/usr/lib/cmake/SFML \
           -S .
     
     - name: Build
-      shell: bash
-      run: cmake --build build --config ${{ matrix.build_type }}
+      run: cmake --build build --parallel 4  # Use parallel builds!
