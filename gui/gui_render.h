@@ -106,7 +106,7 @@ public :
 
 	// output message
 	std::string get_output_message() { return output_message; }
-	void set_output_message(const std::string& msg) { output_message = msg; }
+	void set_output_message(const std::string& msg) { output_message = msg; output_timer.restart();}
 	void clear_output_message() { output_message.clear(); }
 	bool has_output_message() const { return !output_message.empty(); }
 
@@ -140,4 +140,8 @@ public :
 	std::string logger_text;
 	void set_text(sf::Uint32 unicode);
 	bool logger_enabled = false;
+
+	// output props
+	static sf::Clock output_timer; 
+	float output_duration = 10.f;
 };

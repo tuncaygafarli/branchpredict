@@ -17,6 +17,8 @@ constexpr float HEADER_HEIGHT = 60.f;
 constexpr float LOGGER_HEIGHT = 20.f;
 constexpr float MARGIN = 5.f;
 
+sf::Clock GUIRender::output_timer;
+
 GUIRender::GUIRender() {
 	std::string font_path = "./fonts/BigBlueTermPlusNerdFontMono-Regular.ttf";
 
@@ -110,17 +112,20 @@ void GUIRender::update_memory(CPU& cpu) {
 }
 
 void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu) {
-	draw_instructions(window);
-	draw_reg_file(window, cpu);
-	draw_memory(window, cpu);
+    draw_instructions(window);
+    draw_reg_file(window, cpu);
+    draw_memory(window, cpu);
 
-	if (logger_enabled) {
-		draw_prompt(window, cpu);
-	}
+    if (logger_enabled) {
+        draw_prompt(window, cpu);
+    }
 
-	if (get_show_output()) {
-		draw_output(window, cpu);
-	}
+    if (show_output) {
+        if (output_timer.getElapsedTime().asSeconds() >= output_duration) {
+            output_message.clear();
+        }
+        draw_output(window, cpu);
+    }
 }
 
 void GUIRender::draw_box(sf::RenderWindow& window,
