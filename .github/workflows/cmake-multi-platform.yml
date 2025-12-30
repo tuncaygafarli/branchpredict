@@ -2,78 +2,78 @@ name: CI Build
 
 on:
   push:
-    branches: [ "gui" ]
+    branches: ["sfml"]
   pull_request:
-    branches: [ "gui" ]
+    branches: ["sfml"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install System SFML (Pre-built)
-      run: |
-        sudo apt-get update
-        # First, try to install full SFML package
-        sudo apt-get install -y \
-          libsfml-dev \
-          libsfml-graphics2.6 \
-          libsfml-window2.6 \
-          libsfml-system2.6 \
-          libsfml-audio2.6 \
-          libsfml-network2.6
-        
-        # Verify installation
-        ls -la /usr/include/SFML/
-        ls -la /usr/lib/*/cmake/SFML/ 2>/dev/null || true
-    
-    - name: Install Build Dependencies
-      run: |
-        sudo apt-get install -y \
-          build-essential \
-          cmake \
-          pkg-config \
-          libudev-dev \
-          libx11-dev \
-          libxrandr-dev \
-          libxcursor-dev \
-          libxi-dev \
-          libgl1-mesa-dev \
-          libopenal-dev \
-          libflac-dev \
-          libvorbis-dev \
-          libfreetype6-dev
-    
-    - name: Configure with System SFML
-      run: |
-        # Create a simple CMakeLists to test SFML
-        cat > test_sfml.cpp << 'EOF'
-        #include <SFML/Graphics.hpp>
-        int main() {
-            sf::RenderWindow window(sf::VideoMode(800, 600), "Test");
-            return 0;
-        }
-        EOF
-        
-        # Test compile
-        g++ -o test_sfml test_sfml.cpp -lsfml-graphics -lsfml-window -lsfml-system
-        echo "SFML test compilation successful"
-        
-        # Now configure your project
-        cmake -B build \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DBUILD_TESTS=OFF \
-          -DFETCHCONTENT_FULLY_DISCONNECTED=ON \
-          -S .
-    
-    - name: Build Project
-      run: cmake --build build --parallel $(nproc)
-    
-    - name: Verify Output
-      run: |
-        echo "Build contents:"
-        find build -type f -name "CPUINSIGHT*" -o -name "*.exe" 2>/dev/null || true
-        echo "Bin directory:"
-        ls -la build/bin/ 2>/dev/null || true
+      - uses: actions/checkout@v4
+
+      - name: Install System SFML (Pre-built)
+        run: |
+          sudo apt-get update
+          # First, try to install full SFML package
+          sudo apt-get install -y \
+            libsfml-dev \
+            libsfml-graphics2.6 \
+            libsfml-window2.6 \
+            libsfml-system2.6 \
+            libsfml-audio2.6 \
+            libsfml-network2.6
+
+          # Verify installation
+          ls -la /usr/include/SFML/
+          ls -la /usr/lib/*/cmake/SFML/ 2>/dev/null || true
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            pkg-config \
+            libudev-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libgl1-mesa-dev \
+            libopenal-dev \
+            libflac-dev \
+            libvorbis-dev \
+            libfreetype6-dev
+
+      - name: Configure with System SFML
+        run: |
+          # Create a simple CMakeLists to test SFML
+          cat > test_sfml.cpp << 'EOF'
+          #include <SFML/Graphics.hpp>
+          int main() {
+              sf::RenderWindow window(sf::VideoMode(800, 600), "Test");
+              return 0;
+          }
+          EOF
+
+          # Test compile
+          g++ -o test_sfml test_sfml.cpp -lsfml-graphics -lsfml-window -lsfml-system
+          echo "SFML test compilation successful"
+
+          # Now configure your project
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTS=OFF \
+            -DFETCHCONTENT_FULLY_DISCONNECTED=ON \
+            -S .
+
+      - name: Build Project
+        run: cmake --build build --parallel $(nproc)
+
+      - name: Verify Output
+        run: |
+          echo "Build contents:"
+          find build -type f -name "CPUINSIGHT*" -o -name "*.exe" 2>/dev/null || true
+          echo "Bin directory:"
+          ls -la build/bin/ 2>/dev/null || true
