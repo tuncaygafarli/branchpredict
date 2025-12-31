@@ -211,10 +211,15 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
 
    // stop command
    if (cmd == "stop") {
-       gui_render.set_autorun(false);
-       gui_render.set_accumulator(0.f);
+        if(gui_render.get_autorun() == false){
+            gui_render.set_output_message("Invalid process, no processes are running right now.");
+            return;
+        }
+        
+        gui_render.set_autorun(false);
+        gui_render.set_accumulator(0.f);
 
-       gui_render.set_output_message("Stopped the process.");
+        gui_render.set_output_message("Stopped the process.");
    }
 
    //) exit command
