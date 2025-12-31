@@ -13,24 +13,22 @@ void run_gui(CPU& cpu, const T& parse_result);
 int main(int argc, char** argv) {
 
     parser_t parser;
-    auto cli_info  = parser.parse_cli(argc, argv);
+    auto cli_args  = parser.parse_cli(argc, argv);
 
-    if (!cli_info.valid)
+    if (!cli_args.valid)
         return 1;
 
-    CPU cpu(cli_info.predictor);
-    auto parse_result = parser.parse_program(cli_info.input_file);
+    CPU cpu(cli_args.predictor);
+    auto parse_result = parser.parse_program(cli_args.input_file);
 
     cpu.load_program(std::move(parse_result.first));
 
-    if (cli_info.enable_gui) 
-        run_gui(cpu,parse_result);
+    if (cli_args.enable_gui) run_gui(cpu,parse_result);
     else {
         while (!cpu.endofprogram()) cpu.execute();
-		if (cli_info.log_dest == "cout")
-			cpu.log(std::cout);
+		if (cli_args.log_dest == "cout") cpu.log(std::cout);
 		else {
-			std::ofstream os(cli_info.log_dest);
+			std::ofstream os(cli_args.log_dest);
 			cpu.log(os);
 		}
     }
