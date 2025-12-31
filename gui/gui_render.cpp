@@ -20,7 +20,7 @@ constexpr float MARGIN = 5.f;
 sf::Clock GUIRender::output_timer;
 
 GUIRender::GUIRender() {
-	std::string font_path = "./fonts/BigBlueTermPlusNerdFontMono-Regular.ttf";
+	const static std::string font_path = "./fonts/BigBlueTermPlusNerdFontMono-Regular.ttf";
 
 	if (!font.loadFromFile(font_path))
 	{
@@ -106,7 +106,7 @@ void GUIRender::update_memory(CPU& cpu) {
         mem_elements.emplace_back(
             sf::Color(50, 50, 55),
             addr_str,
-            data_str
+            std::move(data_str)
         );
     }
 }
