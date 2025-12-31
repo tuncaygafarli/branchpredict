@@ -28,7 +28,7 @@ namespace gui {
 	template<typename T>
 	void run(CPU& cpu,const T& parse_result) {
 
-		gui::renderer::init("BranchPredict", 800, 600);
+		gui::renderer::init("CpuInsight", 800, 600);
 		GLFWwindow* window = gui::renderer::get_window();
 
 		if (!window)
