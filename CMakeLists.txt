@@ -5,8 +5,29 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# ================================================
+# NEW: Release vs Debug Configuration
+# ================================================
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+endif()
+
+# Optimize for size in Release
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # -Os optimizes for size, -s strips debug symbols
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Os -s -DNDEBUG")
+    # Enable LTO (Link Time Optimization) for smaller code
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -flto")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -flto")
+elseif(MSVC)
+    # /O1 optimizes for size, /GL enables LTO
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O1 /GL /DNDEBUG")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG")
+endif()
+
 # Options
 option(BUILD_TESTS "Build tests" OFF)
+option(USE_STATIC_SFML "Use static SFML linking" OFF)  # NEW: Make optional!
 
 # Set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -15,10 +36,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Compiler warnings
 if(MSVC)
-    add_compile_options(/W4)  # REMOVED: /WX
+    add_compile_options(/W4)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else()
-    add_compile_options(-Wall -Wextra -Wpedantic)  # REMOVED: -Werror
+    add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # --------------------------------------------------------------------
@@ -69,7 +90,15 @@ if(NOT SFML_FOUND)
     set(SFML_BUILD_DOC OFF CACHE BOOL "" FORCE)
     set(SFML_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     set(SFML_BUILD_TEST_SUITE OFF CACHE BOOL "" FORCE)
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libraries" FORCE)
+    
+    # NEW: Dynamic linking by default (smaller executables)
+    if(USE_STATIC_SFML)
+        message(STATUS "Building SFML statically (executable will be larger)")
+        set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    else()
+        message(STATUS "Building SFML dynamically (executable will be smaller)")
+        set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+    endif()
     
     FetchContent_MakeAvailable(sfml)
     
@@ -118,11 +147,17 @@ file(GLOB_RECURSE SRC_FILES
 
 target_sources(${PROJECT_NAME} PRIVATE ${SRC_FILES})
 
+# NEW: Remove unused template instantiations (reduces binary size)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(${PROJECT_NAME} PRIVATE -fdata-sections -ffunction-sections)
+    target_link_options(${PROJECT_NAME} PRIVATE -Wl,--gc-sections)
+endif()
+
 # --------------------------------------------------------------------
 # Include Directories
 # --------------------------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}          # For aliases.h
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/gui
     ${CMAKE_CURRENT_SOURCE_DIR}/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/cpu
@@ -168,7 +203,6 @@ if(WIN32)
         opengl32
         winmm
         gdi32
-        #freetype  # Only if SFML was built with static freetype
     )
     
     # For static linking
@@ -230,18 +264,6 @@ if(BUILD_TESTS AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/asm_tests)
 endif()
 
 # --------------------------------------------------------------------
-# Installation (Optional)
-# --------------------------------------------------------------------
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION bin
-    BUNDLE DESTINATION bin
-)
-
-install(DIRECTORY fonts/
-    DESTINATION share/${PROJECT_NAME}/fonts
-)
-
-# --------------------------------------------------------------------
 # Print Configuration Summary
 # --------------------------------------------------------------------
 message(STATUS "")
@@ -253,5 +275,6 @@ message(STATUS "SFML found: ${SFML_FOUND}")
 if(SFML_ROOT)
     message(STATUS "SFML location: ${SFML_ROOT}")
 endif()
+message(STATUS "SFML linking: ${BUILD_SHARED_LIBS}")
 message(STATUS "Output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 message(STATUS "=========================================")
