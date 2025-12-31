@@ -115,25 +115,30 @@ cd bin
 
 ```
 cpuinsight/
-├── build/                                # Build directory (generated)
-├── vendor/                               # Dependencies (SFML)
-├── src/
-│   ├── gui/                              # GUI rendering and interface
-│   │   ├── gui_render.cpp                # Main GUI rendering logic
-│   │   ├── gui_render.h
-│   │   └── gui_command_parser.cpp
-│   ├── cpu/                              # CPU simulation core
-│   │   ├── cpu.cpp                       # CPU emulation
-│   │   ├── instruction.h                 # Instruction definitions
-│   │   └── branchpredictor.cpp           # Branch prediction algorithms
-│   ├── parser/                           # Assembly parser
-│   │   ├── parser.cpp                    # Assembly parsing
-│   │   └── lookup.cpp                    # Instruction lookup tables
-│   └── main.cpp                          # Application entry point
-├── fonts/                                # Font assets
-├── asm_tests/                            # Assembly test files
-├── CMakeLists.txt                        # Build configuration
-└── README.md                             # This file
+├── cpu/                                      # CPU simulation core
+│ ├── cpu.cpp                                 # CPU emulation
+│ ├── cpu.h                                   # CPU definitions
+│ ├── branchpredictor.cpp                     # Branch predictor algorithms
+│ ├── branchpredictor.h                       # Branch predictor definitions
+│ ├── instruction.cpp                         # Instructions logic
+│ └── instruction.h                           # Instructor definitions
+├── gui/                                      # GUI rendering and interface
+│ ├── gui_render.cpp                          # Main GUI rendering logic
+│ ├── gui_render.h                            # GUI Rendering definitions
+│ ├── gui_command_parser.cpp                  # GUI Command Parser logic (CLI)
+│ ├── gui_command_parser.h                    # GUI Command Parser definitions
+│ ├── helpers.cpp                             # Helper functions
+│ └── helpers.h                               # Helpers definitions
+├── parser/                                   # Parser files
+│ ├── parser.cpp                              # Assembly parsing
+│ ├── parser.h                                # Parser definitions
+│ ├── lookup.cpp                              # Instruction lookup tables
+│ ├── lookup.h                                # Lookup definitions
+│ └── token.h                                 # Token definitions
+├── main.cpp                                  # Entry point
+├── aliases.h                                 # Aliases definitions
+├── CMakeLists.txt                            # CMake Lists
+└── (other files...)
 ```
 
 ## Usage
