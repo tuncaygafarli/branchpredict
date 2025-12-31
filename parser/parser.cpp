@@ -368,40 +368,40 @@ void parser_t::tokenize_line_text(const std::string& line_raw) {
 		}
 
 		if (lookup_t::load_type(token) != load_instruction_t::LOAD_INSTRUCTION_TYPE::UNKNOWN) {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::LOAD_OPERATION, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::LOAD_OPERATION, _line_number, _column);
 		}
 		else if (lookup_t::store_type(token) != store_instruction_t::STORE_INSTRUCTION_TYPE::UNKNOWN) {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::STORE_OPERATION, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::STORE_OPERATION, _line_number, _column);
 		}
 		else if (lookup_t::alui_type(token) != alu_instruction_t::ALU_INSTRUCTION_TYPE::UNKNOWN) {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::ALU_OPERATION_I, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::ALU_OPERATION_I, _line_number, _column);
 		}
 		else if (lookup_t::alur_type(token) != alu_instruction_t::ALU_INSTRUCTION_TYPE::UNKNOWN) {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::ALU_OPERATION_R, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::ALU_OPERATION_R, _line_number, _column);
 		}
 		else if (lookup_t::branch_type(token) != branch_instruction_t::BRANCH_INSTRUCTION_TYPE::UNKNOWN) {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::BRANCH_OPERATION, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::BRANCH_OPERATION, _line_number, _column);
 		}
 		else if (lookup_t::jump_type(token) != jump_instruction_t::JUMP_INSTRUCTION_TYPE::UNKNOWN) {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::JUMP_OPERATION, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::JUMP_OPERATION, _line_number, _column);
 		}
 		else if (lookup_t::is_pseudo(token)) {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::PSUEDO_OPERATION, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::PSUEDO_OPERATION, _line_number, _column);
 		}
 		else if (token == "lui") {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::LOAD_UPPER, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::LOAD_UPPER, _line_number, _column);
 		}
 		else if (token == "auipc") {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::AUIPC, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::AUIPC, _line_number, _column);
 		}
 		else if (lookup_t::reg_id(token) != INVALID_REG_ID) {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::REGISTER, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::REGISTER, _line_number, _column);
 		}
 		else if (lookup_t::is_imm(token)) {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::IMMEDIATE, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::IMMEDIATE, _line_number, _column);
 		}
 		else {
-			_line_tokens.emplace_back(token, TOKEN_TYPE::IDENTIFIER, _line_number, _column);
+			_line_tokens.emplace_back(std::move(token), TOKEN_TYPE::IDENTIFIER, _line_number, _column);
 		}
 	}
 	_line_tokens.emplace_back(std::string(), TOKEN_TYPE::NEW_LINE, _line_number, _column);
