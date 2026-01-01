@@ -89,7 +89,7 @@ void GUIRender::update_instructions(CPU& cpu) {
 void GUIRender::update_memory(CPU& cpu) {
     mem_elements.clear();
     
-    const d_cache_t& d_cache = cpu.get_d_cache();
+    d_cache_t& d_cache = cpu.get_d_cache();
     
     for (const auto& [address, data] : d_cache) {
         std::string addr_str;
@@ -109,6 +109,12 @@ void GUIRender::update_memory(CPU& cpu) {
             std::move(data_str)
         );
     }
+}
+
+void GUIRender::clear_memory(CPU& cpu){
+  mem_elements.clear();
+  d_cache_t& d_cache = cpu.get_d_cache();
+  d_cache.clear();
 }
 
 void GUIRender::draw_gui(sf::RenderWindow& window, CPU& cpu) {

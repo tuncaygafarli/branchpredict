@@ -65,7 +65,8 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
     }
     else if (page_num == 2) {
         oss << "=== CPUInsight Command List [2] ===" << "\n";
-        oss << "keybindings     | Shows current keybinding list" << "\n";
+        oss << "free            | Clears the memory" << "\n";
+        oss << "keybindings     | shows current keybinding list" << "\n";
         oss << "exit            | Terminates the program" << "\n";
     }
     
@@ -118,7 +119,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         }
 
         cpu.reset();
-		gui_render.set_autorun(false);
+	    gui_render.set_autorun(false);
 
 	    gui_render.update_registers(cpu);
         gui_render.instruction_codes.clear();
@@ -127,6 +128,16 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         filename.clear();
 
         gui_render.set_output_message("Successfully unloaded program.");
+    }
+
+    if(cmd == "free"){
+
+     if(cpu.get_d_cache().empty()){
+       gui_render.set_output_message("Cannot clear: Memory cache is already empty!");
+       return;
+     }
+     gui_render.clear_memory(cpu);
+     gui_render.set_output_message("Successfully cleared the memory.");
     }
 
     if(cmd == "delay"){
@@ -203,6 +214,7 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
            gui_render.set_output_message("Couldn't execute the instructions, please load a file first.");
            return;
        }
+
        gui_render.set_autorun(true);
        gui_render.set_accumulator(0.f);
 

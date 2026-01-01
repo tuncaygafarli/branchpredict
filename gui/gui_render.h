@@ -92,6 +92,7 @@ public :
 	void update_registers(CPU& cpu);
 	void update_instructions(CPU& cpu);
 	void update_memory(CPU& cpu);
+  void clear_memory(CPU& cpu);
 
 
 	void run(sf::RenderWindow& window, CPU& cpu, GUICommandParser& gc_parser);
