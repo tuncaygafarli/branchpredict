@@ -131,7 +131,6 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
     }
 
     if(cmd == "free"){
-
      if(cpu.get_d_cache().empty()){
        gui_render.set_output_message("Cannot clear: Memory cache is already empty!");
        return;
