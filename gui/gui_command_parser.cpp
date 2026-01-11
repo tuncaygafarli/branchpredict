@@ -37,7 +37,6 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
     std::ostringstream oss;
     
     int page_num = 1;
-    
     if (!page_num_str.empty()) {
         try {
             page_num = std::stoi(page_num_str);
@@ -58,14 +57,14 @@ void GUICommandParser::parse_and_execute(const std::string& command_line) {
         oss << "load [filename] | Loads RISC-V Assembly file" << "\n";
         oss << "unload          | Unloads current RISC-V Assembly file" << "\n";
         oss << "mode            | Sets current predictor mode" << "\n";
-        oss << "stats           | Shows statistics for executed instructions" << "\n";
+        oss << "free            | Clears the memory" << "\n";
         oss << "run             | Runs the loaded RISC-V Assembly file" << "\n";
         oss << "stop            | Stops the current execution" << "\n";
         oss << "delay           | Sets the autorun delay" << "\n";
     }
     else if (page_num == 2) {
         oss << "=== CPUInsight Command List [2] ===" << "\n";
-        oss << "free            | Clears the memory" << "\n";
+        oss << "stats           | Shows statistics for executed instructions" << "\n";
         oss << "keybindings     | shows current keybinding list" << "\n";
         oss << "exit            | Terminates the program" << "\n";
     }
